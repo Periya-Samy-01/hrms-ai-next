@@ -1,31 +1,29 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 const Sidebar = () => {
   return (
-    <aside className="w-64 h-screen bg-gray-800 text-white flex flex-col">
-      <div className="p-4 border-b border-gray-700">
-        <h2 className="text-xl font-bold">Admin Panel</h2>
-      </div>
-      <nav className="flex-1 p-4">
+    <div className="w-64 bg-gray-900 text-white h-screen p-4">
+      <h2 className="text-2xl font-bold mb-8">Admin Menu</h2>
+      <nav>
         <ul>
-          <li>
-            <Link href="/dashboard/admin" className="block p-2 rounded hover:bg-gray-700">
-              Dashboard
+          <li className="mb-4">
+            <Link href="/dashboard/admin" className="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+              <span className="ml-3">Dashboard</span>
             </Link>
           </li>
-          <li>
-            <Link href="/dashboard/admin/users" className="block p-2 rounded hover:bg-gray-700">
-              Users
+          <li className="mb-4">
+            <Link href="/dashboard/admin/settings" className="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+              <span className="ml-3">Company Settings</span>
             </Link>
           </li>
-          <li>
-            <Link href="/dashboard/admin/settings" className="block p-2 rounded hover:bg-gray-700">
-              Settings
+          <li className="mb-4">
+            <Link href="/dashboard/admin/logs" className="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+              <span className="ml-3">Audit Logs</span>
             </Link>
           </li>
         </ul>
       </nav>
-    </aside>
+    </div>
   );
 };
 

@@ -1,10 +1,10 @@
-import Sidebar from "@/app/components/Sidebar";
+import Sidebar from '../../components/Sidebar';
 
-export default function AdminDashboardLayout({ children }) {
+export default function AdminLayout({ children }) {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-800">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
