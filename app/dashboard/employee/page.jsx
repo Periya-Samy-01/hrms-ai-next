@@ -1,21 +1,55 @@
-import React from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 
 const EmployeeDashboard = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('/api/dashboard/employee');
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await res.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error}</div>;
+  }
+
+  const { user, announcements } = data;
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 p-8">
-      <h1 className="text-3xl font-bold mb-8">Welcome, Alex!</h1>
+      <h1 className="text-3xl font-bold mb-8">Welcome, {user.name}!</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column */}
         <div className="lg:col-span-1 space-y-8">
           {/* My Profile Card */}
           <div className="bg-white rounded-lg shadow p-6 text-center">
             <img
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              src={user.photoUrl}
               alt="Employee"
               className="w-24 h-24 rounded-full mx-auto mb-4"
             />
-            <h2 className="text-xl font-bold">Alex Doe</h2>
-            <p className="text-gray-600">Senior Software Engineer</p>
+            <h2 className="text-xl font-bold">{user.name}</h2>
+            <p className="text-gray-600">{user.jobTitle}</p>
           </div>
 
           {/* Leave Balance Widget */}
@@ -27,25 +61,22 @@ const EmployeeDashboard = () => {
                   <svg className="w-full h-full" viewBox="0 0 36 36">
                     <path
                       className="text-gray-200"
-                      d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="3"
                     />
                     <path
                       className="text-blue-500"
-                      d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="3"
-                      strokeDasharray="75, 100"
+                      strokeDasharray={`${(user.leaveBalances.annual / 20) * 100}, 100`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold">15</span>
+                    <span className="text-2xl font-bold">{user.leaveBalances.annual}</span>
                   </div>
                 </div>
                 <p className="mt-2 text-gray-600">Annual</p>
@@ -55,25 +86,22 @@ const EmployeeDashboard = () => {
                    <svg className="w-full h-full" viewBox="0 0 36 36">
                     <path
                       className="text-gray-200"
-                      d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="3"
                     />
                     <path
                       className="text-green-500"
-                      d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="3"
-                      strokeDasharray="90, 100"
+                      strokeDasharray={`${(user.leaveBalances.sick / 10) * 100}, 100`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold">9</span>
+                    <span className="text-2xl font-bold">{user.leaveBalances.sick}</span>
                   </div>
                 </div>
                 <p className="mt-2 text-gray-600">Sick</p>
@@ -101,18 +129,12 @@ const EmployeeDashboard = () => {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4">Company Announcements</h2>
             <div className="space-y-4 max-h-64 overflow-y-auto">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-bold">Annual Performance Review Cycle</h3>
-                <p className="text-sm text-gray-600">The annual performance review cycle is starting next week. Please complete your self-assessment by October 15th.</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-bold">Open Enrollment for Health Insurance</h3>
-                <p className="text-sm text-gray-600">Open enrollment for 2026 health insurance plans is now open. The deadline to enroll is November 20th.</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-bold">Holiday Schedule</h3>
-                <p className="text-sm text-gray-600">The office will be closed for Thanksgiving on November 27th and 28th.</p>
-              </div>
+              {announcements.map((announcement) => (
+                <div key={announcement._id} className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-bold">{announcement.title}</h3>
+                  <p className="text-sm text-gray-600">{announcement.content}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -120,18 +142,16 @@ const EmployeeDashboard = () => {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4">My Performance Goals</h2>
             <ul className="space-y-4">
-              <li className="flex items-center justify-between">
-                <span>Launch Project Phoenix</span>
-                <span className="text-green-500 font-bold">Completed</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Improve API response time by 15%</span>
-                <span className="text-yellow-500 font-bold">In Progress</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Complete Security Training</span>
-                <span className="text-gray-500 font-bold">Not Started</span>
-              </li>
+              {user.performanceGoals.map((goal, index) => (
+                <li key={index} className="flex items-center justify-between">
+                  <span>{goal.goal}</span>
+                  <span className={`${
+                    goal.status === "Completed" ? "text-green-500" :
+                    goal.status === "In Progress" ? "text-yellow-500" :
+                    "text-gray-500"
+                  } font-bold`}>{goal.status}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
