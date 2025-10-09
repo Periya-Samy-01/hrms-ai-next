@@ -35,9 +35,27 @@ const EmployeeDashboard = () => {
 
   const { user, announcements } = data;
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Failed to logout', error);
+      alert('Logout failed. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 p-8">
-      <h1 className="text-3xl font-bold mb-8">Welcome, {user.name}!</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Welcome, {user.name}!</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 transition-colors"
+        >
+          Logout
+        </button>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column */}
         <div className="lg:col-span-1 space-y-8">
