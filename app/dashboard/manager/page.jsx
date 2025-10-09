@@ -45,16 +45,6 @@ const ManagerDashboard = () => {
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error}</div>;
-  }
-
-  const { pendingApprovals, teamMembers } = data;
-
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -64,6 +54,16 @@ const ManagerDashboard = () => {
       alert('Logout failed. Please try again.');
     }
   };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error}</div>;
+  }
+
+  const { pendingApprovals, teamMembers } = data;
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 p-8">
@@ -83,14 +83,14 @@ const ManagerDashboard = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Pending Approvals</h2>
             <div className="bg-white rounded-lg shadow p-6">
-              {pendingApprovals.length > 0 ? (
+              {pendingApprovals?.length > 0 ? (
                 <ul className="space-y-4">
                   {pendingApprovals.map((request) => (
                     <li key={request._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <p className="font-semibold">{request.type} Request: {request.requester.name}</p>
-                        {request.type === 'Leave' && <p className="text-sm text-gray-600">Dates: {new Date(request.details.startDate).toLocaleDateString()} to {new Date(request.details.endDate).toLocaleDateString()}</p>}
-                        {request.type === 'Expense' && <p className="text-sm text-gray-600">Amount: ${request.details.amount}</p>}
+                        <p className="font-semibold">{request.type} Request: {request.requester?.name || 'Unknown User'}</p>
+                        {request.type === 'Leave' && <p className="text-sm text-gray-600">Dates: {request.details?.startDate ? new Date(request.details.startDate).toLocaleDateString() : 'N/A'} to {request.details?.endDate ? new Date(request.details.endDate).toLocaleDateString() : 'N/A'}</p>}
+                        {request.type === 'Expense' && <p className="text-sm text-gray-600">Amount: ${request.details?.amount || 'N/A'}</p>}
                       </div>
                       <div className="flex space-x-2">
                         <button onClick={() => handleApprovalAction(request._id, 'Approved')} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
@@ -109,15 +109,15 @@ const ManagerDashboard = () => {
           <section>
             <h2 className="text-2xl font-bold mb-4">My Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {teamMembers.map((member) => (
+              {teamMembers?.map((member) => (
                 <div key={member._id} className="bg-white rounded-lg shadow p-6 text-center">
                   <img
-                    src={member.profile.photoUrl}
+                    src={member.profile?.photoUrl || 'https://i.pravatar.cc/150'}
                     alt="Team Member"
                     className="w-24 h-24 rounded-full mx-auto mb-4"
                   />
-                  <h3 className="text-xl font-bold">{member.name}</h3>
-                  <p className="text-gray-600">{member.profile.jobTitle}</p>
+                  <h3 className="text-xl font-bold">{member.name || 'Unknown User'}</h3>
+                  <p className="text-gray-600">{member.profile?.jobTitle || 'No title'}</p>
                 </div>
               ))}
             </div>
