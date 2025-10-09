@@ -27,8 +27,8 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Success: redirect to dashboard
-      router.push("/dashboard");
+      // ✅ Success: redirect to trigger middleware
+      router.push("/");
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }
