@@ -1,14 +1,32 @@
+"use client";
+
 import QuickActions from '../../components/hr/QuickActions';
 import RecruitmentFunnel from '../../components/hr/RecruitmentFunnel';
 import OnboardingTracker from '../../components/hr/OnboardingTracker';
 import PendingApprovals from '../../components/hr/PendingApprovals';
 
 const HRDashboard = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Failed to logout', error);
+      alert('Logout failed. Please try again.');
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="p-8">
-        <header className="mb-8">
+        <header className="mb-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-800">HR Professional Dashboard</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 transition-colors"
+          >
+            Logout
+          </button>
         </header>
 
         {/* Quick Actions Bar */}
