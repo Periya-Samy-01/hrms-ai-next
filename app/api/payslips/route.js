@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/dbConnect';
 import Payslip from '@/models/Payslip';
 import { jwtVerify } from 'jose';
 
@@ -31,7 +31,7 @@ export async function POST(request) {
   }
 
   try {
-    await dbConnect();
+    await connectDB();
     const body = await request.json();
     const {
       employeeId,
