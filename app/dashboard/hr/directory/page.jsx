@@ -16,7 +16,11 @@ const EmployeeDirectoryPage = () => {
           throw new Error('Failed to fetch employees');
         }
         const data = await res.json();
-        setEmployees(data);
+        if (Array.isArray(data)) {
+          setEmployees(data);
+        } else {
+          throw new Error(data.message || 'Failed to fetch employees: Invalid data format');
+        }
       } catch (err) {
         setError(err.message);
       } finally {
