@@ -22,7 +22,9 @@ export async function middleware(req) {
       if (url.pathname === "/" || url.pathname.startsWith("/login")) {
         if (userRole === "manager") {
           url.pathname = "/dashboard/manager";
-        } else {
+        }else if (userRole === "hr") {
+          url.pathname = "/dashboard/hr";
+        }else {
           // Default all other roles to the employee dashboard
           url.pathname = "/dashboard/employee";
         }
