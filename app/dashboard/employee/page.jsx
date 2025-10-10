@@ -66,18 +66,19 @@ const EmployeeDashboard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...newGoal, employeeId: data.user._id }),
+        body: JSON.stringify({ ...newGoal, employeeId: data.user._id, managerId: data.user.manager }),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to add goal');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to add goal');
       }
 
       await fetchGoals(data.user._id); // Refetch goals to show the new one
       setIsModalOpen(false);
     } catch (error) {
       console.error(error);
-      alert('Failed to add goal. Please try again.');
+      alert(error.message);
     }
   };
 
@@ -207,12 +208,20 @@ const EmployeeDashboard = () => {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">My Performance Goals</h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-              >
-                Add New Goal
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  disabled={!user.manager}
+                  className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add New Goal
+                </button>
+                {!user.manager && (
+                  <span className="absolute bottom-full mb-2 hidden group-hover:block w-max bg-black text-white text-xs rounded py-1 px-2">
+                    You must have a manager assigned to add a goal.
+                  </span>
+                )}
+              </div>
             </div>
             <div className="space-y-4">
               {goals.map((goal) => (

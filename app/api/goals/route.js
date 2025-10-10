@@ -27,6 +27,10 @@ export async function POST(req) {
         return NextResponse.json({ message: "Employee not found" }, { status: 404 });
     }
 
+    if (!employee.manager) {
+      return NextResponse.json({ message: "You must have a manager assigned to create a goal." }, { status: 400 });
+    }
+
     const newGoal = new Goal({
       title,
       description,
