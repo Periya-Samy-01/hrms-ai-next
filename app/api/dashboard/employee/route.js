@@ -26,11 +26,13 @@ export async function GET(req) {
 
     return Response.json({
       user: {
+        _id: user._id,
         name: user.name,
         jobTitle: user.profile.jobTitle,
         photoUrl: user.profile.photoUrl,
         leaveBalances: user.leaveBalances,
         performanceGoals: user.performanceGoals,
+        manager: user.manager,
       },
       announcements,
     });

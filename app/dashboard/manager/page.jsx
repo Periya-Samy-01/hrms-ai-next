@@ -129,7 +129,7 @@ const ManagerDashboard = () => {
           <div className="bg-white rounded-lg shadow p-6 mb-8">
             <h3 className="text-xl font-bold mb-4">Team Leave Calendar</h3>
             <div className="grid grid-cols-7 gap-2 text-center">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (<div key={day} className="font-bold">{day}</div>))}
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (<div key={`${day}-${index}`} className="font-bold">{day}</div>))}
               {Array.from({ length: 30 }, (_, i) => (<div key={i} className={`p-2 rounded-full`}>{i + 1}</div>))}
             </div>
           </div>
