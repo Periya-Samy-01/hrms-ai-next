@@ -40,7 +40,7 @@ const HRDashboard = () => {
         <footer className="mt-8 border-t pt-6">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">More Options</h2>
             <div className="flex space-x-4">
-                <a href="/dashboard/hr/directory" className="text-blue-500 hover:underline">Employee Directory</a>
+                <a href="#" className="text-blue-500 hover:underline">Employee Directory</a>
                 <a href="#" className="text-blue-500 hover:underline">HR Reports</a>
             </div>
         </footer>
