@@ -1,85 +1,29 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import AddGoalModal from '../../components/dashboard/employee/AddGoalModal';
 
 const EmployeeDashboard = () => {
   const [data, setData] = useState(null);
-  const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchDashboardData = async () => {
-    try {
-      const res = await fetch('/api/dashboard/employee');
-      if (!res.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const result = await res.json();
-      setData(result);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchGoals = async (userId) => {
-    if (userId) {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`/api/goals?employeeId=${userId}`);
+        const res = await fetch('/api/dashboard/employee');
         if (!res.ok) {
-          throw new Error('Failed to fetch goals');
+          throw new Error('Failed to fetch data');
         }
         const result = await res.json();
-        setGoals(result);
+        setData(result);
       } catch (err) {
-        console.error(err.message);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    }
-  };
+    };
 
-  useEffect(() => {
-    fetchDashboardData();
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    if (data?.user?._id) {
-      fetchGoals(data.user._id);
-    }
-  }, [data]);
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Failed to logout', error);
-      alert('Logout failed. Please try again.');
-    }
-  };
-
-  const handleAddGoal = async (newGoal) => {
-    try {
-      const res = await fetch('/api/goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newGoal),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to add goal');
-      }
-
-      await fetchGoals(data.user._id); // Refetch goals to show the new one
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to add goal. Please try again.');
-    }
-  };
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -91,10 +35,19 @@ const EmployeeDashboard = () => {
 
   const { user, announcements } = data;
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Failed to logout', error);
+      alert('Logout failed. Please try again.');
+    }
+  };
+
   return (
-    <>
-      <div className="min-h-screen bg-gray-50 text-gray-800 p-8">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-gray-50 text-gray-800 p-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Welcome, {user.name}!</h1>
         <button
           onClick={handleLogout}
@@ -205,57 +158,23 @@ const EmployeeDashboard = () => {
 
           {/* My Performance Goals */}
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">My Performance Goals</h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-              >
-                Add New Goal
-              </button>
-            </div>
-            <div className="space-y-4">
-              {goals.map((goal) => (
-                <div key={goal._id} className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold">{goal.title}</h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        goal.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : goal.status === "Active"
-                          ? "bg-blue-100 text-blue-800"
-                          : goal.status === "Pending Approval"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {goal.status}
-                    </span>
-                  </div>
-                  <div className="mt-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-blue-600 h-2.5 rounded-full"
-                        style={{ width: `${goal.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
+            <h2 className="text-xl font-bold mb-4">My Performance Goals</h2>
+            <ul className="space-y-4">
+              {user.performanceGoals.map((goal, index) => (
+                <li key={index} className="flex items-center justify-between">
+                  <span>{goal.goal}</span>
+                  <span className={`${
+                    goal.status === "Completed" ? "text-green-500" :
+                    goal.status === "In Progress" ? "text-yellow-500" :
+                    "text-gray-500"
+                  } font-bold`}>{goal.status}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-      <AddGoalModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAddGoal={handleAddGoal}
-        employeeId={user?._id}
-        managerId={user?.manager}
-      />
-    </>
   );
 };
 

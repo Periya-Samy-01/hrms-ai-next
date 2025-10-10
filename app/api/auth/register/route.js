@@ -19,20 +19,8 @@ export async function POST(req) {
       return Response.json({ error: "User already exists" }, { status: 400 });
     }
 
-    // Find the default manager to assign to the new user
-    const manager = await User.findOne({ email: 'manager@example.com' });
-    if (!manager) {
-      // This should not happen if the database is seeded correctly
-      return Response.json({ error: "Default manager not found. Please seed the database." }, { status: 500 });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      manager: manager._id // Assign the default manager
-    });
+    const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
     console.log("✅ User registered:", newUser);
