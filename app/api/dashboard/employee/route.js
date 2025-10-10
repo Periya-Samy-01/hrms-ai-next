@@ -17,7 +17,10 @@ export async function GET(req) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id)
+      .select("-password")
+      .populate("performanceGoals");
+
     if (!user) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }

@@ -19,12 +19,8 @@ const UserSchema = new mongoose.Schema({
   },
   performanceGoals: [
     {
-      goal: String,
-      status: {
-        type: String,
-        enum: ["Not Started", "In Progress", "Completed"],
-        default: "Not Started",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Goal",
     },
   ],
   manager: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
