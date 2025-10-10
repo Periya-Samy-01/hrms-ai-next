@@ -1,6 +1,7 @@
 import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import User from "@/models/User";
+import Goal from "@/models/Goal";
 import Announcement from "@/models/Announcement";
 
 export async function GET(req) {
