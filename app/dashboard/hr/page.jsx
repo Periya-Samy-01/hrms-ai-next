@@ -2,10 +2,11 @@ import QuickActions from '../../components/hr/QuickActions';
 import RecruitmentFunnel from '../../components/hr/RecruitmentFunnel';
 import OnboardingTracker from '../../components/hr/OnboardingTracker';
 import PendingApprovals from '../../components/hr/PendingApprovals';
+import HRLayout from './layout';
 
 const HRDashboard = () => {
   return (
-    <>
+    <HRLayout>
       <div className="mb-8">
         <QuickActions />
       </div>
@@ -29,7 +30,7 @@ const HRDashboard = () => {
           <a href="#" className="text-blue-500 hover:underline">HR Reports</a>
         </div>
       </footer>
-    </>
+    </HRLayout>
   );
 };
 
