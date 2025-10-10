@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/dbConnect';
 import Payslip from '@/models/Payslip';
 import { jwtVerify } from 'jose';
 
@@ -41,7 +41,7 @@ export async function GET(request, { params }) {
   }
 
   try {
-    await dbConnect();
+    await connectDB();
 
     const payslips = await Payslip.find({ employeeId }).sort({ payPeriodEndDate: -1 });
 

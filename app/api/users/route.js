@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/dbConnect';
 import User from '@/models/User';
 import { jwtVerify } from 'jose';
 
@@ -31,7 +31,7 @@ export async function GET(request) {
   }
 
   try {
-    await dbConnect();
+    await connectDB();
     const users = await User.find({}).select('name email profile.jobTitle'); // Select only necessary fields
     return NextResponse.json(users, { status: 200 });
   } catch (error) {

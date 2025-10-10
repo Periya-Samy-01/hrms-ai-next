@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/dbConnect';
 import User from '@/models/User';
 import { jwtVerify } from 'jose';
 
@@ -32,7 +32,7 @@ export async function GET(request, { params }) {
   }
 
   try {
-    await dbConnect();
+    await connectDB();
     const { employeeId } = params;
     const user = await User.findById(employeeId).select('-password'); // Exclude password from results
 
