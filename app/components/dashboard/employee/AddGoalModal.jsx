@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 
-const AddGoalModal = ({ isOpen, onClose, onAddGoal, employeeId, managerId }) => {
+const AddGoalModal = ({ isOpen, onClose, onAddGoal }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -17,8 +17,6 @@ const AddGoalModal = ({ isOpen, onClose, onAddGoal, employeeId, managerId }) => 
       title,
       description,
       deadline,
-      employeeId,
-      managerId,
     };
 
     try {
