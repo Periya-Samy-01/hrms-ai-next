@@ -43,8 +43,9 @@ export default function LoginPage() {
         <h1 className="text-2xl font-semibold text-center mb-6">Login</h1>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
           <input
+            id="email"
             type="email"
             className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
             value={email}
@@ -54,8 +55,9 @@ export default function LoginPage() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Password</label>
+          <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
           <input
+            id="password"
             type="password"
             className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
             value={password}

@@ -4,7 +4,6 @@ import AddGoalModal from '../../components/dashboard/employee/AddGoalModal';
 
 const EmployeeDashboard = () => {
   const [data, setData] = useState(null);
-  const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,30 +23,9 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const fetchGoals = async (userId) => {
-    if (userId) {
-      try {
-        const res = await fetch(`/api/goals?employeeId=${userId}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch goals');
-        }
-        const result = await res.json();
-        setGoals(result);
-      } catch (err) {
-        console.error(err.message);
-      }
-    }
-  };
-
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
-  useEffect(() => {
-    if (data?.user?._id) {
-      fetchGoals(data.user._id);
-    }
-  }, [data]);
 
   const handleLogout = async () => {
     try {
@@ -74,7 +52,7 @@ const EmployeeDashboard = () => {
         throw new Error(errorData.message || 'Failed to add goal');
       }
 
-      await fetchGoals(data.user._id); // Refetch goals to show the new one
+      await fetchDashboardData(); // Refetch all dashboard data to show the new goal
       setIsModalOpen(false);
     } catch (error) {
       console.error(error);
@@ -224,7 +202,7 @@ const EmployeeDashboard = () => {
               </div>
             </div>
             <div className="space-y-4">
-              {goals.map((goal) => (
+              {user?.performanceGoals?.map((goal) => (
                 <div key={goal._id} className="p-4 bg-gray-50 rounded-lg">
                   <div className="flex justify-between items-center">
                     <h3 className="font-bold">{goal.title}</h3>

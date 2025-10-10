@@ -1,10 +1,20 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import EmployeePerformanceModal from '../../components/dashboard/manager/EmployeePerformanceModal';
 
 const ManagerDashboard = () => {
   const [data, setData] = useState({ pendingApprovals: [], teamMembers: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const handleOpenModal = (employee) => {
+    setSelectedEmployee(employee);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEmployee(null);
+  };
 
   const fetchData = async () => {
     try {
@@ -110,7 +120,11 @@ const ManagerDashboard = () => {
             <h2 className="text-2xl font-bold mb-4">My Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {teamMembers?.map((member) => (
-                <div key={member._id} className="bg-white rounded-lg shadow p-6 text-center">
+                <div
+                  key={member._id}
+                  className="bg-white rounded-lg shadow p-6 text-center cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleOpenModal(member)}
+                >
                   <img
                     src={member.profile?.photoUrl || 'https://i.pravatar.cc/150'}
                     alt="Team Member"
@@ -148,6 +162,14 @@ const ManagerDashboard = () => {
           </div>
         </aside>
       </div>
+
+      {selectedEmployee && (
+        <EmployeePerformanceModal
+          employee={selectedEmployee}
+          onClose={handleCloseModal}
+          onAction={fetchData}
+        />
+      )}
     </div>
   );
 };
