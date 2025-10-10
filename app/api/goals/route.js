@@ -5,25 +5,17 @@ import User from "@/models/User";
 import jwt from "jsonwebtoken";
 
 export async function POST(req) {
-  console.log("➡️ POST /api/goals route hit");
+  await connectDB();
+
+  const token = req.cookies.get("token")?.value;
+
+  if (!token) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    await connectDB();
-    console.log("✅ Database connection successful");
-
-    const token = req.cookies.get("token")?.value;
-    console.log("🍪 Token from cookies:", token);
-
-    if (!token) {
-      console.log("❌ No token found");
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("🔑 Decoded token:", decoded);
-
     const body = await req.json();
-    console.log("📦 Request body:", body);
-
     const {
       title,
       description,
@@ -44,13 +36,10 @@ export async function POST(req) {
       progress: 0,
       deadline,
     });
-    console.log("📝 Creating new goal:", newGoal);
 
     await newGoal.save();
-    console.log("✅ Goal saved successfully");
     return NextResponse.json(newGoal, { status: 201 });
   } catch (error) {
-    console.error("💥 Error in POST /api/goals:", error);
     if (error.name === 'JsonWebTokenError') {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -79,7 +68,6 @@ export async function GET(req) {
       );
     }
 
-    // Security check: ensure the employeeId in the query matches the logged-in user
     if (decoded.id !== employeeId) {
         return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
