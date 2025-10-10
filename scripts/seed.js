@@ -56,20 +56,6 @@ const seedDB = async () => {
     const createdEmployees = await User.insertMany(employees);
     console.log(`${createdEmployees.length} employees created.`);
 
-    // Create HR user
-    const hrUser = new User({
-        _id: new mongoose.Types.ObjectId(),
-        name: 'Michael Brown',
-        email: 'hr@example.com',
-        password: hashedPassword,
-        role: 'hr',
-        profile: {
-            jobTitle: 'HR Specialist',
-        }
-    });
-    await hrUser.save();
-    console.log('HR user created.');
-
     // Assign employees to manager's team
     manager.team = createdEmployees.map(e => e._id);
     await manager.save();
