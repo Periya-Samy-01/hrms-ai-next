@@ -27,8 +27,15 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Success: redirect to trigger middleware
-      router.push("/");
+      // Redirect based on user role
+      const { user } = data;
+      if (user.role === "manager") {
+        router.push("/dashboard/manager");
+      } else if (user.role === "hr") {
+        router.push("/dashboard/hr");
+      } else {
+        router.push("/dashboard/employee");
+      }
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }

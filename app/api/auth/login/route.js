@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "@/models/User";
 import { connectDB } from "@/lib/dbConnect";
+import { generateToken } from "@/lib/auth";
 
 
 export async function POST(req) {
@@ -16,12 +16,8 @@ export async function POST(req) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
-    // ✅ Create JWT
-    const token = jwt.sign(
-      { sub: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // Create JWT using the standardized function
+    const token = generateToken(user);
 
     // ❌ If you only returned this:
     // return NextResponse.json({ message: "Login successful", token });
@@ -29,7 +25,7 @@ export async function POST(req) {
     // ✅ Instead, attach it as a cookie
     const response = NextResponse.json({
       message: "Login successful",
-      user: { id: user._id, email: user.email },
+      user: { id: user._id, email: user.email, role: user.role },
     });
 
     response.cookies.set({
