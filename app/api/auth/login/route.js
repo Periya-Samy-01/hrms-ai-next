@@ -18,7 +18,7 @@ export async function POST(req) {
 
     // ✅ Create JWT
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { sub: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -45,6 +45,7 @@ export async function POST(req) {
     return response;
   } catch (err) {
     console.error("Login error:", err);
-    return NextResponse.json({ error: "❌ Login failed" }, { status: 500 });
+    // Return the actual error message for better debugging
+    return NextResponse.json({ error: err.message || "An unexpected error occurred" }, { status: 500 });
   }
 }
