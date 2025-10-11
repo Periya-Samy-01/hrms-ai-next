@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AddGoalModal from '../../components/dashboard/employee/AddGoalModal';
 
 const EmployeeDashboard = () => {
@@ -158,9 +159,11 @@ const EmployeeDashboard = () => {
             <button className="w-full bg-blue-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
               Request Leave
             </button>
-            <button className="w-full bg-green-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-green-600 transition-colors">
-              View Payslips
-            </button>
+            <Link href="/dashboard/employee/payslips" passHref>
+              <button className="w-full bg-green-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-green-600 transition-colors">
+                View Payslips
+              </button>
+            </Link>
             <button className="w-full bg-yellow-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-yellow-600 transition-colors">
               Submit Feedback
             </button>
