@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { verifyToken } from "@/lib/auth"; // Use consistent token verification
 import { connectDB } from "@/lib/dbConnect";
 import Payslip from "@/models/Payslip";
 import User from "@/models/User"; // Ensure User model is imported for ref integrity
 
-const getUserIdFromToken = async (request) => {
+const getUserIdFromToken = (request) => {
   const token = request.cookies.get("token")?.value;
   if (!token) {
     return null;
   }
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    // The 'sub' (subject) claim is typically used for the user ID
-    const { payload } = await jwtVerify(token, secret);
-    return payload.sub;
+    // Use the same verification function as other parts of the app
+    const decoded = verifyToken(token);
+    // The 'sub' (subject) claim is used for the user ID
+    return decoded ? decoded.sub : null;
   } catch (err) {
     console.error("Invalid token:", err);
     return null;
@@ -21,7 +21,7 @@ const getUserIdFromToken = async (request) => {
 };
 
 export async function GET(request) {
-  const userId = await getUserIdFromToken(request);
+  const userId = getUserIdFromToken(request);
 
   if (!userId) {
     return NextResponse.json(

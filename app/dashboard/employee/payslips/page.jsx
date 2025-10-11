@@ -12,7 +12,7 @@ const PayslipsPage = () => {
   useEffect(() => {
     const fetchPayslips = async () => {
       try {
-        const res = await fetch('/api/payslips');
+        const res = await fetch('/api/payslips', { credentials: 'include' });
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || 'Failed to fetch payslips');
