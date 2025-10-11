@@ -25,7 +25,8 @@ async function verifyAuth(request) {
   }
 }
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const { params } = context;
   const authResult = await verifyAuth(request);
   if (!authResult.authorized) {
     return NextResponse.json({ message: authResult.message }, { status: authResult.status });
