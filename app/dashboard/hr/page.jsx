@@ -29,7 +29,7 @@ const HRDashboard = () => {
           <a href="#" className="text-blue-500 hover:underline">HR Reports</a>
         </div>
       </footer>
-    </HRLayout>
+    </div>
   );
 };
 
