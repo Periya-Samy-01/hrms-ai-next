@@ -17,7 +17,7 @@ export async function GET(req) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const manager = await User.findById(decoded.id).select("-password");
+    const manager = await User.findById(decoded.sub).select("-password");
     if (!manager || manager.role !== "manager") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
