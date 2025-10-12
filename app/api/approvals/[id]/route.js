@@ -4,7 +4,9 @@ import ApprovalRequest from "@/models/ApprovalRequest";
 import User from "@/models/User";
 import Goal from "@/models/Goal";
 
-export async function PATCH(req, { params }) {
+export async function PATCH(req, context) {
+  const { params } = context;
+  const id = params.id;
   try {
     await connectDB();
     const token = req.cookies.get("token")?.value;
@@ -29,11 +31,11 @@ export async function PATCH(req, { params }) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    let itemToUpdate = await Goal.findById(params.id);
+    let itemToUpdate = await Goal.findById(id);
     let itemType = "Goal";
 
     if (!itemToUpdate) {
-      itemToUpdate = await ApprovalRequest.findById(params.id);
+      itemToUpdate = await ApprovalRequest.findById(id);
       itemType = "ApprovalRequest";
     }
 
