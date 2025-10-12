@@ -53,6 +53,14 @@ const seedDB = async () => {
         profile: { jobTitle: 'HR Specialist' },
         manager: manager._id,
       },
+      {
+        _id: new mongoose.Types.ObjectId(),
+        name: 'Admin User',
+        email: 'admin@example.com',
+        password: hashedPassword,
+        role: 'admin',
+        profile: { jobTitle: 'System Administrator' },
+      },
     ];
 
     const createdEmployees = await User.insertMany(employees);
