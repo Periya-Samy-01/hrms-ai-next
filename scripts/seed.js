@@ -19,51 +19,52 @@ const seedDB = async () => {
     await SalaryStructure.deleteMany({});
     console.log('Existing data cleared.');
 
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const password = 'password123';
 
-    // Create Manager
-    const manager = new User({
-      _id: new mongoose.Types.ObjectId(),
-      name: 'Jane Doe',
-      email: 'manager@example.com',
-      password: hashedPassword,
-      role: 'manager',
-      profile: {
-        jobTitle: 'Engineering Manager',
-      }
-    });
-
-    // Create Employees
-    const employees = [
+    // Create users individually to ensure password hashing is correct for each
+    const usersToCreate = [
       {
-        _id: new mongoose.Types.ObjectId(),
         name: 'John Smith',
         email: 'john.smith@example.com',
-        password: hashedPassword,
         role: 'manager',
         profile: { jobTitle: 'Frontend Developer' },
-        manager: manager._id,
       },
       {
-        _id: new mongoose.Types.ObjectId(),
         name: 'Emily White',
         email: 'emily.white@example.com',
-        password: hashedPassword,
         role: 'hr',
         profile: { jobTitle: 'HR Specialist' },
-        manager: manager._id,
       },
       {
-        _id: new mongoose.Types.ObjectId(),
         name: 'Admin User',
         email: 'admin@example.com',
-        password: hashedPassword,
         role: 'admin',
         profile: { jobTitle: 'System Administrator' },
       },
+      {
+        name: 'Jane Doe',
+        email: 'manager@example.com',
+        role: 'manager',
+        profile: { jobTitle: 'Engineering Manager' },
+      },
     ];
 
-    const createdEmployees = await User.insertMany(employees);
+    const createdUsers = [];
+    for (const userData of usersToCreate) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = new User({ ...userData, password: hashedPassword });
+      await user.save();
+      createdUsers.push(user);
+    }
+
+    const manager = createdUsers.find(u => u.email === 'manager@example.com');
+    const employees = createdUsers.filter(u => u.email !== 'manager@example.com' && u.role !== 'admin');
+
+    manager.team = employees.map(e => e._id);
+    await manager.save();
+
+    console.log(`${createdUsers.length} users created.`);
+    const createdEmployees = employees;
     console.log(`${createdEmployees.length} employees created.`);
 
     // Assign employees to manager's team
