@@ -46,7 +46,15 @@ export async function PATCH(req, { params }) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    itemToUpdate.status = status === "Denied" ? "Rejected" : status;
+    if (itemType === "Goal") {
+      if (status === "Approved") {
+        itemToUpdate.status = "Active";
+      } else {
+        itemToUpdate.status = "Needs Revision";
+      }
+    } else {
+      itemToUpdate.status = status;
+    }
     await itemToUpdate.save();
 
     return Response.json({ message: `Request ${status.toLowerCase()}`, itemToUpdate });
