@@ -61,6 +61,12 @@ export async function POST(req) {
     });
 
     await newStructure.save();
+
+    // Link the new structure to the user document
+    await User.findByIdAndUpdate(employeeId, {
+      $set: { salaryStructure: newStructure._id },
+    });
+
     const populatedStructure = await SalaryStructure.findById(newStructure._id).populate("employeeId", "name profile.jobTitle");
 
     return NextResponse.json(populatedStructure, { status: 201 });
