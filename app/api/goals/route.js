@@ -42,6 +42,10 @@ export async function POST(req) {
     });
 
     await newGoal.save();
+
+    employee.performanceGoals.push(newGoal._id);
+    await employee.save();
+
     return NextResponse.json(newGoal, { status: 201 });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
