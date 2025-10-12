@@ -34,6 +34,7 @@ const HRDashboard = () => {
         <h2 className="text-lg font-semibold text-gray-700 mb-4">More Options</h2>
         <div className="flex space-x-4">
           <a href="/dashboard/hr/directory" className="text-blue-500 hover:underline">Employee Directory</a>
+          <a href="/dashboard/hr/manage-salary" className="text-blue-500 hover:underline">Manage Salary</a>
           <a href="#" className="text-blue-500 hover:underline">HR Reports</a>
         </div>
       </footer>

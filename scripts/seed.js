@@ -17,57 +17,47 @@ const seedDB = async () => {
     await Goal.deleteMany({}); // Clear existing goals
     console.log('Existing data cleared.');
 
-    const hashedPassword = await bcrypt.hash('password123', 10);
-
-    // Create Manager
-    const manager = new User({
-      _id: new mongoose.Types.ObjectId(),
-      name: 'Jane Doe',
-      email: 'manager@example.com',
-      password: hashedPassword,
-      role: 'manager',
-      profile: {
-        jobTitle: 'Engineering Manager',
-      }
-    });
-
-    // Create Employees
-    const employees = [
-      {
-        _id: new mongoose.Types.ObjectId(),
-        name: 'John Smith',
-        email: 'john.smith@example.com',
-        password: hashedPassword,
-        role: 'manager',
-        profile: { jobTitle: 'Frontend Developer' },
-        manager: manager._id,
-      },
-      {
-        _id: new mongoose.Types.ObjectId(),
-        name: 'Emily White',
-        email: 'emily.white@example.com',
-        password: hashedPassword,
-        role: 'hr',
-        profile: { jobTitle: 'HR Specialist' },
-        manager: manager._id,
-      },
+    const usersData = [
+      { name: 'Jane Doe', email: 'manager@example.com', role: 'manager', profile: { jobTitle: 'Engineering Manager' } },
+      { name: 'John Smith', email: 'john.smith@example.com', role: 'manager', profile: { jobTitle: 'Frontend Developer' } },
+      { name: 'Emily White', email: 'emily.white@example.com', role: 'hr', profile: { jobTitle: 'HR Specialist' } },
+      { name: 'Admin User', email: 'admin@example.com', role: 'admin', profile: { jobTitle: 'System Administrator' } }
     ];
 
-    const createdEmployees = await User.insertMany(employees);
-    console.log(`${createdEmployees.length} employees created.`);
+    // Hash passwords and create users
+    const createdUsers = await Promise.all(
+      usersData.map(async (userData) => {
+        const password = await bcrypt.hash('password123', 10);
+        const user = new User({ ...userData, password });
+        return user.save();
+      })
+    );
+    console.log(`${createdUsers.length} users created.`);
 
-    // Assign employees to manager's team
-    manager.team = createdEmployees.map(e => e._id);
+    // --- Structure the team ---
+    const manager = createdUsers.find(u => u.email === 'manager@example.com');
+    const employees = createdUsers.filter(u => u.email !== 'manager@example.com' && u.email !== 'admin@example.com');
+
+    // Assign employees to manager's team and set their manager
+    manager.team = employees.map(e => e._id);
     await manager.save();
-    console.log('Manager created and team assigned.');
 
-    // Create Goals for employees
+    for (const employee of employees) {
+      employee.manager = manager._id;
+      await employee.save();
+    }
+    console.log('Manager and team assigned.');
+
+    // --- Create Goals for employees ---
+    const johnSmith = createdUsers.find(u => u.email === 'john.smith@example.com');
+    const emilyWhite = createdUsers.find(u => u.email === 'emily.white@example.com');
+
     const goals = [
       // Goal for John Smith - Pending Approval
       {
         title: 'Complete Next.js Advanced Tutorial',
         description: 'Finish the official advanced Next.js course to improve frontend skills.',
-        employeeId: createdEmployees[0]._id,
+        employeeId: johnSmith._id,
         managerId: manager._id,
         status: 'Pending Approval',
         deadline: new Date('2025-12-31'),
@@ -76,7 +66,7 @@ const seedDB = async () => {
       {
         title: 'Refactor Authentication Flow',
         description: 'Improve the performance and security of the user authentication module.',
-        employeeId: createdEmployees[0]._id,
+        employeeId: johnSmith._id,
         managerId: manager._id,
         status: 'Active',
         progress: 40,
@@ -86,7 +76,7 @@ const seedDB = async () => {
       {
         title: 'Design New Database Schema for Analytics',
         description: 'Create a scalable and efficient database schema for the new analytics feature.',
-        employeeId: createdEmployees[1]._id,
+        employeeId: emilyWhite._id,
         managerId: manager._id,
         status: 'Pending Approval',
         deadline: new Date('2026-01-15'),
@@ -95,7 +85,7 @@ const seedDB = async () => {
       {
         title: 'Optimize API Response Times',
         description: 'Reduce the average API response time by 20% through query optimization.',
-        employeeId: createdEmployees[1]._id,
+        employeeId: emilyWhite._id,
         managerId: manager._id,
         status: 'Completed',
         progress: 100,
