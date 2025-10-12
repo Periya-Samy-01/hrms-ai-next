@@ -2,6 +2,7 @@ import QuickActions from '../../components/hr/QuickActions';
 import RecruitmentFunnel from '../../components/hr/RecruitmentFunnel';
 import OnboardingTracker from '../../components/hr/OnboardingTracker';
 import PendingApprovals from '../../components/hr/PendingApprovals';
+import ManagePayroll from '../../components/hr/ManagePayroll';
 
 const HRDashboard = () => {
   return (
@@ -11,6 +12,9 @@ const HRDashboard = () => {
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
         <main className="w-full lg:w-2/3">
+          <section className="mb-8">
+            <ManagePayroll />
+          </section>
           <section className="mb-8">
             <RecruitmentFunnel />
           </section>
