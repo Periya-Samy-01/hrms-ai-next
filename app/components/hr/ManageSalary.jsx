@@ -155,7 +155,9 @@ const ManageSalary = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {structures.map(structure => (
+                {structures
+                  .filter(structure => structure.employeeId) // Filter out structures with null employeeId
+                  .map(structure => (
                   <tr key={structure._id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{structure.employeeId.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{structure.employeeId.profile.jobTitle}</td>
