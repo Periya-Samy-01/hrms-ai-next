@@ -24,10 +24,7 @@ const UserSchema = new mongoose.Schema({
     },
   ],
   manager: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  team: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    default: [],
-  },
+  team: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

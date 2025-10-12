@@ -11,7 +11,8 @@ const AdminDashboard = () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/login");
-    } catch (error)      console.error("Failed to logout", error);
+    } catch (error) {
+      console.error("Failed to logout", error);
     }
   };
 

@@ -29,9 +29,7 @@ export default function LoginPage() {
 
       // Redirect based on user role
       const { user } = data;
-      if (user.role === "admin") {
-        router.push("/dashboard/admin");
-      } else if (user.role === "manager") {
+      if (user.role === "manager") {
         router.push("/dashboard/manager");
       } else if (user.role === "hr") {
         router.push("/dashboard/hr");
