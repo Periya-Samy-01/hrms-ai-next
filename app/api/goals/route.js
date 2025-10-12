@@ -22,7 +22,7 @@ export async function POST(req) {
       deadline,
     } = body;
 
-    const employee = await User.findById(decoded.id);
+    const employee = await User.findById(decoded.sub);
     if (!employee) {
         return NextResponse.json({ message: "Employee not found" }, { status: 404 });
     }
@@ -72,7 +72,7 @@ export async function GET(req) {
       );
     }
 
-    if (decoded.id !== employeeId) {
+    if (decoded.sub !== employeeId) {
         return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
