@@ -5,8 +5,9 @@ import User from "@/models/User";
 import Goal from "@/models/Goal";
 
 export async function PATCH(req, context) {
-  const { params } = context;
-  const id = params.id;
+  // Workaround for a persistent Next.js warning about `params` not being awaited.
+  // We extract the ID directly from the request URL instead of using context.
+  const id = new URL(req.url).pathname.split('/').pop();
   try {
     await connectDB();
     const token = req.cookies.get("token")?.value;
