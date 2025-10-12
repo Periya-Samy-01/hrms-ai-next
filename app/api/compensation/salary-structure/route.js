@@ -7,8 +7,7 @@ import User from "@/models/User";
 
 // GET handler to fetch all salary structures
 export async function GET(req) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = (await cookies()).get("token")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -31,8 +30,7 @@ export async function GET(req) {
 
 // POST handler to create a new salary structure
 export async function POST(req) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = (await cookies()).get("token")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
