@@ -2,6 +2,7 @@ import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import ApprovalRequest from "@/models/ApprovalRequest";
 import User from "@/models/User";
+import Goal from "@/models/Goal";
 
 export async function PATCH(req, { params }) {
   try {
@@ -17,29 +18,38 @@ export async function PATCH(req, { params }) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const manager = await User.findById(decoded.id);
+    const manager = await User.findById(decoded.sub);
     if (!manager || manager.role !== "manager") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { status } = await req.json();
-    if (!status || !["Approved", "Denied"].includes(status)) {
+    const validStatuses = ["Approved", "Denied", "Rejected"];
+    if (!status || !validStatuses.includes(status)) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const approvalRequest = await ApprovalRequest.findById(params.id);
-    if (!approvalRequest) {
+    let itemToUpdate = await Goal.findById(params.id);
+    let itemType = "Goal";
+
+    if (!itemToUpdate) {
+      itemToUpdate = await ApprovalRequest.findById(params.id);
+      itemType = "ApprovalRequest";
+    }
+
+    if (!itemToUpdate) {
       return Response.json({ error: "Request not found" }, { status: 404 });
     }
 
-    if (approvalRequest.manager.toString() !== manager._id.toString()) {
+    const managerIdToCheck = itemType === "Goal" ? itemToUpdate.managerId : itemToUpdate.manager;
+    if (managerIdToCheck.toString() !== manager._id.toString()) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    approvalRequest.status = status;
-    await approvalRequest.save();
+    itemToUpdate.status = status === "Denied" ? "Rejected" : status;
+    await itemToUpdate.save();
 
-    return Response.json({ message: `Request ${status.toLowerCase()}`, approvalRequest });
+    return Response.json({ message: `Request ${status.toLowerCase()}`, itemToUpdate });
   } catch (error) {
     console.error("💥 Error in updating request:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
