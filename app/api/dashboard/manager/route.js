@@ -2,6 +2,7 @@ import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import User from "@/models/User";
 import ApprovalRequest from "@/models/ApprovalRequest";
+import Goal from "@/models/Goal";
 
 export async function GET(req) {
   try {
@@ -23,10 +24,24 @@ export async function GET(req) {
     }
 
     const pendingApprovals = await ApprovalRequest.find({ manager: manager._id, status: "Pending" }).populate("requester", "name");
+    const pendingGoals = await Goal.find({ managerId: manager._id, status: "Pending Approval" }).populate("employeeId", "name");
+
+    const formattedGoals = pendingGoals.map(goal => ({
+      _id: goal._id,
+      type: "Goal",
+      requester: goal.employeeId,
+      details: {
+        title: goal.title,
+        description: goal.description,
+      },
+      status: goal.status
+    }));
+
+    const allPendingApprovals = [...pendingApprovals, ...formattedGoals];
     const teamMembers = await User.find({ _id: { $in: manager.team } }).select("name profile");
 
     return Response.json({
-      pendingApprovals,
+      pendingApprovals: allPendingApprovals,
       teamMembers,
     });
   } catch (error) {
