@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const PayslipSchema = new mongoose.Schema({
-  employeeId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -18,7 +18,7 @@ const PayslipSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  totalDeductions: {
+  deductions: {
     type: Number,
     required: true,
   },
@@ -28,8 +28,12 @@ const PayslipSchema = new mongoose.Schema({
   },
   breakdown: {
     type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-export default mongoose.models.Payslip ||
-  mongoose.model("Payslip", PayslipSchema);
+export default mongoose.models.Payslip || mongoose.model("Payslip", PayslipSchema);
