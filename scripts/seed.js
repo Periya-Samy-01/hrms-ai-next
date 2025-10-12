@@ -3,7 +3,8 @@ dotenv.config({ path: '.env.local' });
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
-import Goal from '../models/Goal.js'; // Import Goal model
+import Goal from '../models/Goal.js';
+import SalaryStructure from '../models/SalaryStructure.js';
 import { connectDB } from '../lib/dbConnect.js';
 
 const seedDB = async () => {
@@ -14,7 +15,8 @@ const seedDB = async () => {
 
     console.log('Clearing existing data...');
     await User.deleteMany({});
-    await Goal.deleteMany({}); // Clear existing goals
+    await Goal.deleteMany({});
+    await SalaryStructure.deleteMany({});
     console.log('Existing data cleared.');
 
     const hashedPassword = await bcrypt.hash('password123', 10);
@@ -113,6 +115,23 @@ const seedDB = async () => {
       });
     }
     console.log('Goals linked to respective employees.');
+
+    // Create Salary Structures
+    const salaryStructures = [
+      {
+        employeeId: createdEmployees[0]._id,
+        baseSalary: 75000,
+        payFrequency: 'Monthly',
+      },
+      {
+        employeeId: createdEmployees[1]._id,
+        baseSalary: 85000,
+        payFrequency: 'Monthly',
+      },
+    ];
+
+    await SalaryStructure.insertMany(salaryStructures);
+    console.log(`${salaryStructures.length} salary structures created.`);
 
     console.log('✅ Database seeded successfully!');
   } catch (error) {
