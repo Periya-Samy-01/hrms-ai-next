@@ -3,8 +3,7 @@ dotenv.config({ path: '.env.local' });
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
-import Goal from '../models/Goal.js';
-import SalaryStructure from '../models/SalaryStructure.js';
+import Goal from '../models/Goal.js'; // Import Goal model
 import { connectDB } from '../lib/dbConnect.js';
 
 const seedDB = async () => {
@@ -15,56 +14,46 @@ const seedDB = async () => {
 
     console.log('Clearing existing data...');
     await User.deleteMany({});
-    await Goal.deleteMany({});
-    await SalaryStructure.deleteMany({});
+    await Goal.deleteMany({}); // Clear existing goals
     console.log('Existing data cleared.');
 
-    const password = 'password123';
+    const hashedPassword = await bcrypt.hash('password123', 10);
 
-    // Create users individually to ensure password hashing is correct for each
-    const usersToCreate = [
+    // Create Manager
+    const manager = new User({
+      _id: new mongoose.Types.ObjectId(),
+      name: 'Jane Doe',
+      email: 'manager@example.com',
+      password: hashedPassword,
+      role: 'manager',
+      profile: {
+        jobTitle: 'Engineering Manager',
+      }
+    });
+
+    // Create Employees
+    const employees = [
       {
+        _id: new mongoose.Types.ObjectId(),
         name: 'John Smith',
         email: 'john.smith@example.com',
+        password: hashedPassword,
         role: 'manager',
         profile: { jobTitle: 'Frontend Developer' },
+        manager: manager._id,
       },
       {
+        _id: new mongoose.Types.ObjectId(),
         name: 'Emily White',
         email: 'emily.white@example.com',
+        password: hashedPassword,
         role: 'hr',
         profile: { jobTitle: 'HR Specialist' },
-      },
-      {
-        name: 'Admin User',
-        email: 'admin@example.com',
-        role: 'admin',
-        profile: { jobTitle: 'System Administrator' },
-      },
-      {
-        name: 'Jane Doe',
-        email: 'manager@example.com',
-        role: 'manager',
-        profile: { jobTitle: 'Engineering Manager' },
+        manager: manager._id,
       },
     ];
 
-    const createdUsers = [];
-    for (const userData of usersToCreate) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = new User({ ...userData, password: hashedPassword });
-      await user.save();
-      createdUsers.push(user);
-    }
-
-    const manager = createdUsers.find(u => u.email === 'manager@example.com');
-    const employees = createdUsers.filter(u => u.email !== 'manager@example.com' && u.role !== 'admin');
-
-    manager.team = employees.map(e => e._id);
-    await manager.save();
-
-    console.log(`${createdUsers.length} users created.`);
-    const createdEmployees = employees;
+    const createdEmployees = await User.insertMany(employees);
     console.log(`${createdEmployees.length} employees created.`);
 
     // Assign employees to manager's team
@@ -124,23 +113,6 @@ const seedDB = async () => {
       });
     }
     console.log('Goals linked to respective employees.');
-
-    // Create Salary Structures
-    const salaryStructures = [
-      {
-        employeeId: createdEmployees[0]._id,
-        baseSalary: 75000,
-        payFrequency: 'Monthly',
-      },
-      {
-        employeeId: createdEmployees[1]._id,
-        baseSalary: 85000,
-        payFrequency: 'Monthly',
-      },
-    ];
-
-    await SalaryStructure.insertMany(salaryStructures);
-    console.log(`${salaryStructures.length} salary structures created.`);
 
     console.log('✅ Database seeded successfully!');
   } catch (error) {

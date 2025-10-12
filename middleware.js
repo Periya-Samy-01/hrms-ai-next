@@ -20,9 +20,7 @@ export async function middleware(req) {
 
       // If a logged-in user is on the login page or root, redirect to their specific dashboard
       if (url.pathname === "/" || url.pathname.startsWith("/login")) {
-        if (userRole === "admin") {
-          url.pathname = "/dashboard/admin";
-        } else if (userRole === "manager") {
+        if (userRole === "manager") {
           url.pathname = "/dashboard/manager";
         } else if (userRole === "hr") {
           url.pathname = "/dashboard/hr";
