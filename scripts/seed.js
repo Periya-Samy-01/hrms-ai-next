@@ -19,7 +19,7 @@ const seedDB = async () => {
 
     const usersData = [
       { name: 'Jane Doe', email: 'manager@example.com', role: 'manager', profile: { jobTitle: 'Engineering Manager' } },
-      { name: 'John Smith', email: 'john.smith@example.com', role: 'manager', profile: { jobTitle: 'Frontend Developer' } },
+      { name: 'John Smith', email: 'john.smith@example.com', role: 'employee', profile: { jobTitle: 'Frontend Developer' } },
       { name: 'Emily White', email: 'emily.white@example.com', role: 'hr', profile: { jobTitle: 'HR Specialist' } },
       { name: 'Admin User', email: 'admin@example.com', role: 'admin', profile: { jobTitle: 'System Administrator' } }
     ];
