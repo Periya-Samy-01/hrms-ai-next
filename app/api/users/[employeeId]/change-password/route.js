@@ -5,8 +5,7 @@ import { jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request, context) {
-  const { params } = context;
-  const { employeeId } = params;
+  const employeeId = new URL(request.url).pathname.split('/').slice(-2, -1)[0];
 
   const token = request.cookies.get('token')?.value;
   if (!token) {
@@ -18,7 +17,12 @@ export async function POST(request, context) {
     const { payload } = await jwtVerify(token, secret);
 
     if (payload.role !== 'admin') {
-      return NextResponse.json({ message: 'Forbidden: Only admins can reset passwords.' }, { status: 403 });
+      return NextResponse.json({ message: 'Forbidden: Only admins can change passwords.' }, { status: 403 });
+    }
+
+    const { newPassword } = await request.json();
+    if (!newPassword || newPassword.length < 8) {
+      return NextResponse.json({ message: 'Password must be at least 8 characters long.' }, { status: 400 });
     }
 
     await connectDB();
@@ -28,19 +32,18 @@ export async function POST(request, context) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const newPassword = 'password123'; // Temporary default password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     user.password = hashedPassword;
     await user.save();
 
-    return NextResponse.json({ message: `Password for ${user.name} has been reset.` }, { status: 200 });
+    return NextResponse.json({ message: `Password for ${user.name} has been changed.` }, { status: 200 });
 
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'JWTExpired') {
         return NextResponse.json({ message: 'Invalid token.' }, { status: 401 });
     }
-    console.error(`POST /api/users/${employeeId}/reset-password Error:`, error);
+    console.error(`POST /api/users/${employeeId}/change-password Error:`, error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -4,9 +4,11 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 
 const RoleDistributionChart = ({ users }) => {
-  const roleCounts = users.reduce((acc, user) => {
-    acc[user.role] = (acc[user.role] || 0) + 1;
-    return acc;
+  const roleCounts = users
+    .filter(user => user.role) // Filter out users without a role
+    .reduce((acc, user) => {
+      acc[user.role] = (acc[user.role] || 0) + 1;
+      return acc;
   }, {});
 
   const data = Object.keys(roleCounts).map(role => ({

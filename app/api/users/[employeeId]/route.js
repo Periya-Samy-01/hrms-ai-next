@@ -26,7 +26,7 @@ async function verifyAuth(request) {
 }
 
 export async function GET(request, context) {
-  const { params } = context;
+  const employeeId = new URL(request.url).pathname.split('/').pop();
   const authResult = await verifyAuth(request);
   if (!authResult.authorized) {
     return NextResponse.json({ message: authResult.message }, { status: authResult.status });
@@ -34,7 +34,6 @@ export async function GET(request, context) {
 
   try {
     await connectDB();
-    const { employeeId } = params;
     const user = await User.findById(employeeId).select('-password');
 
     if (!user) {
@@ -43,14 +42,13 @@ export async function GET(request, context) {
 
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
-    console.error(`GET /api/users/${params.employeeId} Error:`, error);
+    console.error(`GET /api/users/${employeeId} Error:`, error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 
 export async function PUT(request, context) {
-  const { params } = context;
-  const { employeeId } = params;
+  const employeeId = new URL(request.url).pathname.split('/').pop();
 
   const token = request.cookies.get('token')?.value;
   if (!token) {
