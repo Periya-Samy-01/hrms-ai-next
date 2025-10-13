@@ -33,7 +33,7 @@ export async function GET(request) {
   try {
     await connectDB();
     // Select only non-sensitive fields
-    const users = await User.find({}).select('name email profile.jobTitle');
+    const users = await User.find({}).select('name email role profile.jobTitle');
     return NextResponse.json(users, { status: 200 });
   } catch (error) {
     console.error('GET /api/users Error:', error);
