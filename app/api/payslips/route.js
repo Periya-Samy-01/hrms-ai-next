@@ -33,7 +33,7 @@ export async function GET(request) {
   try {
     await connectDB();
 
-    const payslips = await Payslip.find({ employeeId: userId }).sort({ payPeriodEndDate: -1 });
+    const payslips = await Payslip.find({ user: userId }).sort({ payPeriodEndDate: -1 });
 
     if (!payslips) {
       return NextResponse.json([], { status: 200 }); // Return empty array if no payslips found
