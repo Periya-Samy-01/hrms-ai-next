@@ -33,19 +33,63 @@ const EditRoleModal = ({ user, onClose, onSave }) => {
   );
 };
 
+const ChangePasswordModal = ({ user, onClose, onSave }) => {
+  const [newPassword, setNewPassword] = useState('');
+
+  if (!user) return null;
+
+  const handleSave = () => {
+    if (newPassword.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    }
+    onSave(user._id, newPassword);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+        <h2 className="text-2xl mb-4">Change Password for {user.name}</h2>
+        <input
+          type="password"
+          placeholder="Enter new password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="bg-gray-700 text-white rounded-lg p-2 w-full mb-4"
+        />
+        <div className="flex justify-end">
+          <button onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+            Cancel
+          </button>
+          <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UserManagementTable = ({ users, refreshUsers }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
+  };
+
+  const handleChangePasswordClick = (user) => {
+    setSelectedUser(user);
+    setIsPasswordModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    setIsPasswordModalOpen(false);
     setSelectedUser(null);
   };
 
@@ -68,24 +112,25 @@ const UserManagementTable = ({ users, refreshUsers }) => {
     }
   };
 
-  const handleResetPassword = async (user) => {
-    if (window.confirm(`Are you sure you want to reset the password for ${user.name}?`)) {
-      try {
-        const response = await fetch(`/api/users/${user._id}/reset-password`, {
-          method: 'POST',
-        });
+  const handleSavePassword = async (userId, newPassword) => {
+    try {
+      const response = await fetch(`/api/users/${userId}/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok) {
-          alert(data.message);
-        } else {
-          alert(`Error: ${data.message}`);
-        }
-      } catch (error) {
-        console.error('Failed to reset password', error);
-        alert('An error occurred while resetting the password.');
+      if (response.ok) {
+        alert(data.message);
+        handleCloseModal();
+      } else {
+        alert(`Error: ${data.message}`);
       }
+    } catch (error) {
+      console.error('Failed to change password', error);
+      alert('An error occurred while changing the password.');
     }
   };
 
@@ -136,15 +181,16 @@ const UserManagementTable = ({ users, refreshUsers }) => {
                 <button onClick={() => handleEditClick(user)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
                   Edit Role
                 </button>
-                <button onClick={() => handleResetPassword(user)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
-                  Reset Password
+                <button onClick={() => handleChangePasswordClick(user)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                  Change Password
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {isModalOpen && <EditRoleModal user={selectedUser} onClose={handleCloseModal} onSave={handleSaveRole} />}
+      {isEditModalOpen && <EditRoleModal user={selectedUser} onClose={handleCloseModal} onSave={handleSaveRole} />}
+      {isPasswordModalOpen && <ChangePasswordModal user={selectedUser} onClose={handleCloseModal} onSave={handleSavePassword} />}
     </div>
   );
 };
