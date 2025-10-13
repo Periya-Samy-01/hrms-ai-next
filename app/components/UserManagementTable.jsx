@@ -1,17 +1,93 @@
 'use client';
 import { useState } from 'react';
 
-const users = [
-  { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'Admin' },
-  { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'HR' },
-  { id: 3, name: 'Sam Wilson', email: 'sam.wilson@example.com', role: 'Manager' },
-  { id: 4, name: 'Alice Johnson', email: 'alice.j@example.com', role: 'Employee' },
-  { id: 5, name: 'Bob Brown', email: 'bob.b@example.com', role: 'Employee' },
-];
+const EditRoleModal = ({ user, onClose, onSave }) => {
+  const [newRole, setNewRole] = useState(user.role);
 
-const UserManagementTable = () => {
+  if (!user) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+        <h2 className="text-2xl mb-4">Edit Role for {user.name}</h2>
+        <select
+          value={newRole}
+          onChange={(e) => setNewRole(e.target.value)}
+          className="bg-gray-700 text-white rounded-lg p-2 w-full mb-4"
+        >
+          <option value="admin">Admin</option>
+          <option value="hr">HR</option>
+          <option value="manager">Manager</option>
+          <option value="employee">Employee</option>
+        </select>
+        <div className="flex justify-end">
+          <button onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+            Cancel
+          </button>
+          <button onClick={() => onSave(user._id, newRole)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const UserManagementTable = ({ users, refreshUsers }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleEditClick = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleSaveRole = async (userId, newRole) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (response.ok) {
+        await refreshUsers();
+        handleCloseModal();
+      } else {
+        console.error('Failed to update role');
+      }
+    } catch (error) {
+      console.error('Failed to update role', error);
+    }
+  };
+
+  const handleResetPassword = async (user) => {
+    if (window.confirm(`Are you sure you want to reset the password for ${user.name}?`)) {
+      try {
+        const response = await fetch(`/api/users/${user._id}/reset-password`, {
+          method: 'POST',
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert(data.message);
+        } else {
+          alert(`Error: ${data.message}`);
+        }
+      } catch (error) {
+        console.error('Failed to reset password', error);
+        alert('An error occurred while resetting the password.');
+      }
+    }
+  };
 
   const filteredUsers = users
     .filter(user =>
@@ -52,15 +128,15 @@ const UserManagementTable = () => {
         </thead>
         <tbody>
           {filteredUsers.map(user => (
-            <tr key={user.id}>
+            <tr key={user._id}>
               <td className="py-2 px-4 border-b border-gray-800">{user.name}</td>
               <td className="py-2 px-4 border-b border-gray-800">{user.email}</td>
               <td className="py-2 px-4 border-b border-gray-800">{user.role}</td>
               <td className="py-2 px-4 border-b border-gray-800">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
+                <button onClick={() => handleEditClick(user)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
                   Edit Role
                 </button>
-                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                <button onClick={() => handleResetPassword(user)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
                   Reset Password
                 </button>
               </td>
@@ -68,6 +144,7 @@ const UserManagementTable = () => {
           ))}
         </tbody>
       </table>
+      {isModalOpen && <EditRoleModal user={selectedUser} onClose={handleCloseModal} onSave={handleSaveRole} />}
     </div>
   );
 };

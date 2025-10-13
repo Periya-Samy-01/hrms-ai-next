@@ -1,16 +1,19 @@
 'use client';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Admin', value: 1 },
-  { name: 'HR', value: 1 },
-  { name: 'Manager', value: 1 },
-  { name: 'Employee', value: 2 },
-];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const RoleDistributionChart = ({ users }) => {
+  const roleCounts = users.reduce((acc, user) => {
+    acc[user.role] = (acc[user.role] || 0) + 1;
+    return acc;
+  }, {});
 
-const RoleDistributionChart = () => {
+  const data = Object.keys(roleCounts).map(role => ({
+    name: role,
+    value: roleCounts[role],
+  }));
+
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-lg" style={{ height: '400px' }}>
       <h2 className="text-xl font-semibold text-white mb-4">User Role Distribution</h2>
