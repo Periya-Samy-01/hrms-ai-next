@@ -85,6 +85,8 @@ export async function GET(request) {
         jobTitle: user.profile.jobTitle,
         riskScore: Math.min(riskScore, 100), // Cap score at 100
         contributingFactors,
+        overtimeHours,
+        satisfactionScore,
       };
     });
 
