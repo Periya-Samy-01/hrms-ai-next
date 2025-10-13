@@ -1,11 +1,31 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import KpiCard from '../../components/KpiCard';
 import UserManagementTable from '../../components/UserManagementTable';
 import RoleDistributionChart from '../../components/RoleDistributionChart';
 
 const AdminDashboard = () => {
   const router = useRouter();
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        console.error('Failed to fetch users');
+      }
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -17,7 +37,7 @@ const AdminDashboard = () => {
   };
 
   const kpiData = [
-    { title: 'Total Users', value: '1,234' },
+    { title: 'Total Users', value: users.length },
     { title: 'Active Sessions', value: '56' },
     { title: 'Database Status', value: 'Online', status: 'Online' },
     { title: 'API Health', value: 'Online', status: 'Online' },
@@ -42,10 +62,10 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <UserManagementTable />
+          <UserManagementTable users={users} refreshUsers={fetchUsers} />
         </div>
         <div>
-          <RoleDistributionChart />
+          <RoleDistributionChart users={users} />
         </div>
       </div>
     </div>
