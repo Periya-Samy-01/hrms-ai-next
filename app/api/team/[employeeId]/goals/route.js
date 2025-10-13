@@ -25,7 +25,7 @@ export async function GET(req, { params }) {
     const { employeeId } = params;
 
     // Ensure the employee is in the manager's team
-    if (!manager.team.includes(employeeId)) {
+    if (!manager.team.map(id => id.toString()).includes(employeeId)) {
         return new Response(JSON.stringify({ error: "Employee not in your team" }), { status: 403 });
     }
 
