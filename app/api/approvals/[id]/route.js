@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnect";
 import ApprovalRequest from "@/models/ApprovalRequest";
 import User from "@/models/User";
 import Goal from "@/models/Goal";
+import AuditEvent from "@/models/AuditEvent";
 
 export async function PATCH(req, context) {
   // Workaround for a persistent Next.js warning about `params` not being awaited.
@@ -59,6 +60,18 @@ export async function PATCH(req, context) {
       itemToUpdate.status = status;
     }
     await itemToUpdate.save();
+
+    if (itemType === "Goal" && itemToUpdate.status === "Active") {
+      const auditEvent = new AuditEvent({
+        actorId: manager._id,
+        actionType: "GOAL_APPROVED",
+        details: {
+          goalId: itemToUpdate._id,
+          employeeId: itemToUpdate.employeeId,
+        },
+      });
+      await auditEvent.save();
+    }
 
     return Response.json({ message: `Request ${status.toLowerCase()}`, itemToUpdate });
   } catch (error) {

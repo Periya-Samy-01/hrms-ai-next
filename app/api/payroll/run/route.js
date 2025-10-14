@@ -4,6 +4,7 @@ import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import SalaryStructure from "@/models/SalaryStructure";
 import Payslip from "@/models/Payslip";
+import AuditEvent from "@/models/AuditEvent";
 
 export async function POST(req) {
   const cookieStore = cookies();
@@ -74,6 +75,17 @@ export async function POST(req) {
       await newPayslip.save();
       processedCount++;
     }
+
+    const auditEvent = new AuditEvent({
+      actorId: decodedToken.sub,
+      actionType: "PAYROLL_RUN",
+      details: {
+        payPeriodStartDate,
+        payPeriodEndDate,
+        processedEmployees: processedCount,
+      },
+    });
+    await auditEvent.save();
 
     return NextResponse.json({
       message: `Payroll run completed successfully for ${processedCount} employees.`,
