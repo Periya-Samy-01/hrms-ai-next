@@ -4,6 +4,7 @@ import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import SalaryStructure from "@/models/SalaryStructure";
 import User from "@/models/User";
+import AuditEvent from "@/models/AuditEvent";
 
 // GET handler to fetch all salary structures
 export async function GET(req) {
@@ -66,6 +67,16 @@ export async function POST(req) {
     await User.findByIdAndUpdate(employeeId, {
       $set: { salaryStructure: newStructure._id },
     });
+
+    const auditEvent = new AuditEvent({
+      actorId: decodedToken.sub,
+      actionType: "SALARY_UPDATED",
+      details: {
+        employeeId: employeeId,
+        baseSalary: baseSalary,
+      },
+    });
+    await auditEvent.save();
 
     const populatedStructure = await SalaryStructure.findById(newStructure._id).populate("employeeId", "name profile.jobTitle");
 
