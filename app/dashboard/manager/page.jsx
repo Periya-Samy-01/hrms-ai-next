@@ -58,9 +58,6 @@ const ManagerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Manager Dashboard</h1>
-      </div>
       <div className="flex space-x-8">
         {/* Main Content */}
         <main className="w-2/3">
