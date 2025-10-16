@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/dbConnect";
 import Notification from "@/models/Notification";
 
 export async function PATCH(req) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
