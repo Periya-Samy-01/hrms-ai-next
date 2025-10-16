@@ -17,7 +17,7 @@ export async function GET(req, { params }) {
       return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401 });
     }
 
-    const manager = await User.findById(decoded.sub);
+    const manager = await User.findById(decoded.id);
     if (!manager || manager.role !== "manager") {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
