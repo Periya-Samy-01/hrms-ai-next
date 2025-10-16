@@ -4,6 +4,7 @@ import ApprovalRequest from "@/models/ApprovalRequest";
 import User from "@/models/User";
 import Goal from "@/models/Goal";
 import AuditEvent from "@/models/AuditEvent";
+import Notification from "@/models/Notification";
 
 export async function PATCH(req, context) {
   // Workaround for a persistent Next.js warning about `params` not being awaited.
@@ -51,15 +52,26 @@ export async function PATCH(req, context) {
     }
 
     if (itemType === "Goal") {
+      let notificationMessage = "";
       if (status === "Approved") {
         itemToUpdate.status = "Active";
+        notificationMessage = `Your goal "${itemToUpdate.title}" has been approved.`;
       } else {
         itemToUpdate.status = "Needs Revision";
+        notificationMessage = `Your goal "${itemToUpdate.title}" needs revision.`;
       }
+      await itemToUpdate.save();
+
+      // Create a notification for the employee
+      await Notification.create({
+        recipientId: itemToUpdate.employeeId,
+        message: notificationMessage,
+        link: "/dashboard/goals",
+      });
     } else {
       itemToUpdate.status = status;
+      await itemToUpdate.save();
     }
-    await itemToUpdate.save();
 
     if (itemType === "Goal" && itemToUpdate.status === "Active") {
       const auditEvent = new AuditEvent({
