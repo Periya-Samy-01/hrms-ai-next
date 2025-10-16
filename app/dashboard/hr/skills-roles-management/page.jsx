@@ -1,7 +1,7 @@
 "use client";
 
-import MasterSkillsList from '@/components/hr/MasterSkillsList';
-import RoleSkillRequirements from '@/components/hr/RoleSkillRequirements';
+import MasterSkillsList from './components/MasterSkillsList';
+import RoleSkillRequirements from './components/RoleSkillRequirements';
 
 const SkillsRolesManagementPage = () => {
   return (
