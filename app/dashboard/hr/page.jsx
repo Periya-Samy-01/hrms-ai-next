@@ -35,6 +35,7 @@ const HRDashboard = () => {
         <div className="flex space-x-4">
           <a href="/dashboard/hr/directory" className="text-blue-500 hover:underline">Employee Directory</a>
           <a href="/dashboard/hr/manage-salary" className="text-blue-500 hover:underline">Manage Salary</a>
+          <a href="/dashboard/hr/skills-roles-management" className="text-blue-500 hover:underline">Skills & Roles Management</a>
           <a href="/dashboard/hr/analytics" className="text-blue-500 hover:underline">Analytics & Insights</a>
           <a href="#" className="text-blue-500 hover:underline">HR Reports</a>
         </div>

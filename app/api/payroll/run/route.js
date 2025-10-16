@@ -5,7 +5,6 @@ import { connectDB } from "@/lib/dbConnect";
 import SalaryStructure from "@/models/SalaryStructure";
 import Payslip from "@/models/Payslip";
 import AuditEvent from "@/models/AuditEvent";
-import Notification from "@/models/Notification";
 
 export async function POST(req) {
   const cookieStore = cookies();
@@ -74,14 +73,6 @@ export async function POST(req) {
       });
 
       await newPayslip.save();
-
-      // Create a notification for the employee
-      await Notification.create({
-        recipientId: user._id,
-        message: `Your payslip for the period ${payPeriodStartDate} to ${payPeriodEndDate} is available.`,
-        link: "/dashboard/payslips",
-      });
-
       processedCount++;
     }
 

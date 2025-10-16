@@ -1,11 +1,20 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import EmployeePerformanceModal from '../../components/dashboard/manager/EmployeePerformanceModal';
 
 const ManagerDashboard = () => {
   const [data, setData] = useState({ pendingApprovals: [], teamMembers: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const handleOpenModal = (employee) => {
+    setSelectedEmployee(employee);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEmployee(null);
+  };
 
   const fetchData = async () => {
     try {
@@ -46,6 +55,16 @@ const ManagerDashboard = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Failed to logout', error);
+      alert('Logout failed. Please try again.');
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -58,6 +77,15 @@ const ManagerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Manager Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 transition-colors"
+        >
+          Logout
+        </button>
+      </div>
       <div className="flex space-x-8">
         {/* Main Content */}
         <main className="w-2/3">
@@ -92,19 +120,19 @@ const ManagerDashboard = () => {
             <h2 className="text-2xl font-bold mb-4">My Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {teamMembers?.map((member) => (
-                <Link href={`/dashboard/team/${member._id}`} key={member._id}>
-                  <div
-                    className="bg-white rounded-lg shadow p-6 text-center cursor-pointer hover:shadow-lg transition-shadow"
-                  >
-                    <img
-                      src={member.profile?.photoUrl || 'https://i.pravatar.cc/150'}
-                      alt="Team Member"
-                      className="w-24 h-24 rounded-full mx-auto mb-4"
-                    />
-                    <h3 className="text-xl font-bold">{member.name || 'Unknown User'}</h3>
-                    <p className="text-gray-600">{member.profile?.jobTitle || 'No title'}</p>
-                  </div>
-                </Link>
+                <div
+                  key={member._id}
+                  className="bg-white rounded-lg shadow p-6 text-center cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleOpenModal(member)}
+                >
+                  <img
+                    src={member.profile?.photoUrl || 'https://i.pravatar.cc/150'}
+                    alt="Team Member"
+                    className="w-24 h-24 rounded-full mx-auto mb-4"
+                  />
+                  <h3 className="text-xl font-bold">{member.name || 'Unknown User'}</h3>
+                  <p className="text-gray-600">{member.profile?.jobTitle || 'No title'}</p>
+                </div>
               ))}
             </div>
           </section>
@@ -134,6 +162,14 @@ const ManagerDashboard = () => {
           </div>
         </aside>
       </div>
+
+      {selectedEmployee && (
+        <EmployeePerformanceModal
+          employee={selectedEmployee}
+          onClose={handleCloseModal}
+          onAction={fetchData}
+        />
+      )}
     </div>
   );
 };
