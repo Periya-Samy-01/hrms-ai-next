@@ -17,7 +17,7 @@ export async function POST(req) {
     if (!isPasswordValid) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
     // Create JWT using the standardized function
-    const token = generateToken(user);
+    const token = await generateToken(user);
 
     // ❌ If you only returned this:
     // return NextResponse.json({ message: "Login successful", token });
