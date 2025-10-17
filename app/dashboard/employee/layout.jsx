@@ -1,11 +1,9 @@
-import DashboardHeader from '../../components/hr/DashboardHeader';
 import AIAssistant from '../../components/AIAssistant';
 
-export default function HRLayout({ children }) {
+export default function EmployeeLayout({ children }) {
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="p-8">
-        <DashboardHeader />
         <main>{children}</main>
         <AIAssistant />
       </div>
