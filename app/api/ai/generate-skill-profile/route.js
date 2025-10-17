@@ -33,6 +33,7 @@ export async function POST(req) {
         if (!token) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
+
         const user = verifyToken(token);
         if (!user || !['Admin', 'HR'].includes(user.role)) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
