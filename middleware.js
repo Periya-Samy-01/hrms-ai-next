@@ -55,10 +55,20 @@ export async function middleware(req) {
     // Add any other role-based access control here if needed
 
   } catch (err) {
-    // If token is invalid, clear it and redirect to login
-    console.error("Invalid token:", err);
-    url.pathname = "/login";
-    const response = NextResponse.redirect(url);
+    console.error("Invalid token detected:", err.message);
+
+    // If the request was for an API route, return a 401 JSON response and clear the cookie.
+    if (req.nextUrl.pathname.startsWith("/api")) {
+      const response = NextResponse.json(
+        { message: "Authentication failed: Invalid token" },
+        { status: 401 }
+      );
+      response.cookies.delete("token");
+      return response;
+    }
+
+    // For page navigations, redirect to login and clear the cookie.
+    const response = NextResponse.redirect(new URL("/login", req.url));
     response.cookies.delete("token");
     return response;
   }
