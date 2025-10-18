@@ -4,6 +4,7 @@ import Goal from "@/models/Goal";
 import User from "@/models/User";
 
 export async function GET(req, { params }) {
+  const { employeeId } = params;
   try {
     await connectDB();
     const token = req.cookies.get("token")?.value;
@@ -17,12 +18,10 @@ export async function GET(req, { params }) {
       return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401 });
     }
 
-    const manager = await User.findById(decoded.id);
+    const manager = await User.findById(decoded.sub);
     if (!manager || manager.role !== "manager") {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
-
-    const { employeeId } = params;
 
     // Ensure the employee is in the manager's team
     if (!manager.team.map(id => id.toString()).includes(employeeId)) {

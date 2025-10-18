@@ -7,6 +7,7 @@ import Skill from '@/models/Skill';
 import { verifyToken } from '@/lib/auth';
 
 export async function GET(req, { params }) {
+  const { employeeId } = params;
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -16,8 +17,6 @@ export async function GET(req, { params }) {
   if (!decoded || !['manager', 'admin', 'hr'].includes(decoded.role)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
-
-  const { employeeId } = params;
 
   if (!employeeId) {
     return NextResponse.json({ message: 'Employee ID is required' }, { status: 400 });
