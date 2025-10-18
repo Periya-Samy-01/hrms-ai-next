@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday } from 'date-fns';
 import EmployeePerformanceModal from '../../components/dashboard/manager/EmployeePerformanceModal';
 
 const ManagerDashboard = () => {
@@ -75,7 +76,11 @@ const ManagerDashboard = () => {
   }
 
   const { pendingApprovals, teamMembers } = data;
-
+    const today = new Date();
+    const firstDay = startOfMonth(today);
+    const lastDay = endOfMonth(today);
+    const daysInMonth = eachDayOfInterval({ start: firstDay, end: lastDay });
+    const startingDayIndex = getDay(firstDay);
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 p-8">
       <div className="flex justify-between items-center mb-8">
@@ -106,7 +111,7 @@ const ManagerDashboard = () => {
                       </div>
                       <div className="flex space-x-2">
                         <button onClick={() => handleApprovalAction(request._id, 'Approved')} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
-                        <button onClick={() => handleApprovalAction(request._id, 'Rejected')} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Deny</button>
+                        <button onClick={() => handleApprovalAction(request._id, 'Rejected')} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Reject</button>
                       </div>
                     </li>
                   ))}
@@ -143,10 +148,15 @@ const ManagerDashboard = () => {
         {/* Right Sidebar (Static as per current scope) */}
         <aside className="w-1/3">
           <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h3 className="text-xl font-bold mb-4">Team Leave Calendar</h3>
+            <h3 className="text-xl font-bold mb-4">{format(today, 'MMMM yyyy')}</h3>
             <div className="grid grid-cols-7 gap-2 text-center">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (<div key={`${day}-${index}`} className="font-bold">{day}</div>))}
-              {Array.from({ length: 30 }, (_, i) => (<div key={i} className={`p-2 rounded-full`}>{i + 1}</div>))}
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="font-bold text-xs">{day}</div>)}
+              {Array.from({ length: startingDayIndex }).map((_, index) => <div key={`empty-${index}`} />)}
+              {daysInMonth.map(day => (
+                <div key={day.toString()} className={`p-2 rounded-full flex items-center justify-center h-8 w-8 ${isToday(day) ? 'bg-blue-500 text-white' : ''}`}>
+                  {format(day, 'd')}
+                </div>
+              ))}
             </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
