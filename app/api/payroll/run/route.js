@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import SalaryStructure from "@/models/SalaryStructure";
@@ -7,8 +6,7 @@ import Payslip from "@/models/Payslip";
 import AuditEvent from "@/models/AuditEvent";
 
 export async function POST(req) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = req.cookies.get("token")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
