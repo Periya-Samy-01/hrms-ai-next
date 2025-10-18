@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const decoded = verifyToken(token);
+    const decoded = await verifyToken(token);
     if (!decoded) {
       return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401 });
     }

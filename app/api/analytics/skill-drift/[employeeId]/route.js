@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const decoded = verifyToken(token);
+  const decoded = await verifyToken(token);
   if (!decoded || !['manager', 'admin', 'hr'].includes(decoded.role)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
