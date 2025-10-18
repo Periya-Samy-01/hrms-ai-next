@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "node scripts/seed.js"
+    "db:seed": "dotenv -e .env.local node scripts/seed.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -15,6 +15,7 @@
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
+    "dotenv-cli": "^10.0.0",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
