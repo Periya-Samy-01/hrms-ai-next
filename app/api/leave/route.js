@@ -20,7 +20,7 @@ export async function POST(req) {
   }
 
   try {
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.sub);
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
@@ -30,7 +30,7 @@ export async function POST(req) {
     }
 
     const leaveRequest = new LeaveRequest({
-      employee: decoded.id,
+      employee: decoded.sub,
       startDate,
       endDate,
       reason,
