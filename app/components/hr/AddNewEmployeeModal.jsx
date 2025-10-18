@@ -5,11 +5,10 @@ const AddNewEmployeeModal = ({ isOpen, onClose, onAddEmployee }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('employee');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddEmployee({ name, email, password, role });
+    onAddEmployee({ name, email, password, role: 'employee' });
   };
 
   if (!isOpen) {
@@ -59,22 +58,6 @@ const AddNewEmployeeModal = ({ isOpen, onClose, onAddEmployee }) => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
-          </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
-              Role
-            </label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="employee">Employee</option>
-              <option value="manager">Manager</option>
-              <option value="hr">HR</option>
-              <option value="admin">Admin</option>
-            </select>
           </div>
           <div className="flex items-center justify-between">
             <button
