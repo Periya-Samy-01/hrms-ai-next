@@ -54,11 +54,13 @@ const PendingApprovals = () => {
     return <div>Error: {error}</div>;
   }
 
+  const validApprovals = approvals.filter(request => request.requester);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Pending HR Approvals</h2>
       <ul className="space-y-4">
-        {approvals.map((request) => (
+        {validApprovals.map((request) => (
           <li key={request._id} className="p-3 bg-gray-50 rounded-md">
             <div className="flex justify-between items-center">
               <div>
