@@ -36,7 +36,8 @@ const PendingApprovals = () => {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update approval request');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to update approval request');
       }
 
       await fetchApprovals();
