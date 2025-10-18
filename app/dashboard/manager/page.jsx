@@ -35,28 +35,23 @@ const ManagerDashboard = () => {
     fetchData();
   }, []);
 
-  const handleApprovalAction = async (id, status, type) => {
-    const url = type === 'Goal' ? `/api/goals/${id}` : `/api/approvals/${id}`;
-    const body = type === 'Goal'
-      ? JSON.stringify({ status: status === 'Approved' ? 'Active' : 'Needs Revision' })
-      : JSON.stringify({ status });
-
+  const handleApprovalAction = async (id, status) => {
     try {
-      const res = await fetch(url, {
+      const res = await fetch(`/api/approvals/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: body,
+        body: JSON.stringify({ status }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || `Failed to update ${type} request`);
+        throw new Error(errorData.message || 'Failed to update request');
       }
 
       // Refresh data to show updated list
       fetchData();
     } catch (err) {
-      console.error(`Failed to process ${type} approval:`, err);
+      console.error('Failed to process approval:', err);
       alert(`Error: ${err.message}`);
     }
   };
@@ -110,8 +105,8 @@ const ManagerDashboard = () => {
                         {request.type === 'Goal' && <p className="text-sm text-gray-600">Goal: "{request.details?.title || 'N/A'}"</p>}
                       </div>
                       <div className="flex space-x-2">
-                        <button onClick={() => handleApprovalAction(request._id, 'Approved', request.type)} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
-                        <button onClick={() => handleApprovalAction(request._id, 'Denied', request.type)} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Deny</button>
+                        <button onClick={() => handleApprovalAction(request._id, 'Approved')} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
+                        <button onClick={() => handleApprovalAction(request._id, 'Rejected')} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Deny</button>
                       </div>
                     </li>
                   ))}

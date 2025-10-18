@@ -46,6 +46,8 @@ export async function POST(req) {
         endDate,
         description: reason,
       },
+      referenceId: leaveRequest._id,
+      referenceModel: 'LeaveRequest',
     });
     await approvalRequest.save();
 
