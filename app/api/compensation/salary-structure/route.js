@@ -14,7 +14,7 @@ export async function GET(req) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const decodedToken = verifyToken(token);
+  const decodedToken = await verifyToken(token);
   if (!decodedToken || (decodedToken.role !== "admin" && decodedToken.role !== "hr")) {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
@@ -37,7 +37,7 @@ export async function POST(req) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const decodedToken = verifyToken(token);
+  const decodedToken = await verifyToken(token);
   if (!decodedToken || (decodedToken.role !== "admin" && decodedToken.role !== "hr")) {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }

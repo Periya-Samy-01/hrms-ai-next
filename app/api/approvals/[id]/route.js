@@ -1,14 +1,9 @@
+
 import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import ApprovalRequest from "@/models/ApprovalRequest";
-import User from "@/models/User";
-import Goal from "@/models/Goal";
-import AuditEvent from "@/models/AuditEvent";
 
-export async function PATCH(req, context) {
-  // Workaround for a persistent Next.js warning about `params` not being awaited.
-  // We extract the ID directly from the request URL instead of using context.
-  const id = new URL(req.url).pathname.split('/').pop();
+export async function PATCH(req, { params }) {
   try {
     await connectDB();
     const token = req.cookies.get("token")?.value;
@@ -17,65 +12,36 @@ export async function PATCH(req, context) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = verifyToken(token);
+    const decoded = await verifyToken(token);
     if (!decoded) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const manager = await User.findById(decoded.sub);
-    if (!manager || manager.role !== "manager") {
+    if (decoded.role !== "hr" && decoded.role !== "manager" && decoded.role !== "admin") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { status } = await req.json();
-    const validStatuses = ["Approved", "Denied", "Rejected"];
-    if (!status || !validStatuses.includes(status)) {
+    if (!status || !["Approved", "Rejected"].includes(status)) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    let itemToUpdate = await Goal.findById(id);
-    let itemType = "Goal";
-
-    if (!itemToUpdate) {
-      itemToUpdate = await ApprovalRequest.findById(id);
-      itemType = "ApprovalRequest";
+    const approval = await ApprovalRequest.findById(params.id);
+    if (!approval) {
+      return Response.json({ error: "Approval request not found" }, { status: 404 });
     }
 
-    if (!itemToUpdate) {
-      return Response.json({ error: "Request not found" }, { status: 404 });
-    }
-
-    const managerIdToCheck = itemType === "Goal" ? itemToUpdate.managerId : itemToUpdate.manager;
-    if (managerIdToCheck.toString() !== manager._id.toString()) {
+    // Managers can only approve requests for their own team
+    if (decoded.role === "manager" && approval.manager.toString() !== decoded.sub) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (itemType === "Goal") {
-      if (status === "Approved") {
-        itemToUpdate.status = "Active";
-      } else {
-        itemToUpdate.status = "Needs Revision";
-      }
-    } else {
-      itemToUpdate.status = status;
-    }
-    await itemToUpdate.save();
+    approval.status = status;
+    await approval.save();
 
-    if (itemType === "Goal" && itemToUpdate.status === "Active") {
-      const auditEvent = new AuditEvent({
-        actorId: manager._id,
-        actionType: "GOAL_APPROVED",
-        details: {
-          goalId: itemToUpdate._id,
-          employeeId: itemToUpdate.employeeId,
-        },
-      });
-      await auditEvent.save();
-    }
-
-    return Response.json({ message: `Request ${status.toLowerCase()}`, itemToUpdate });
+    return Response.json(approval);
   } catch (error) {
-    console.error("💥 Error in updating request:", error);
+    console.error("💥 Error updating approval:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
