@@ -40,3 +40,36 @@ export async function GET(request) {
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function POST(request) {
+  const authResult = await verifyAuth(request);
+  if (!authResult.authorized) {
+    return NextResponse.json({ message: authResult.message }, { status: authResult.status });
+  }
+
+  try {
+    await connectDB();
+    const { name, email, password, role } = await request.json();
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ message: 'User already exists' }, { status: 409 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
+
+    return NextResponse.json(newUser, { status: 201 });
+  } catch (error) {
+    console.error('POST /api/users Error:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
