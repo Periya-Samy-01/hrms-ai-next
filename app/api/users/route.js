@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/dbConnect';
 import User from '@/models/User';
 import { jwtVerify } from 'jose';
+import bcrypt from 'bcryptjs';
 
 async function verifyAuth(request) {
   const token = request.cookies.get('token')?.value;

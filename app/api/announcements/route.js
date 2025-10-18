@@ -17,7 +17,7 @@ export async function POST(req) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.sub);
     if (!user || user.role !== 'admin' && user.role !== 'hr') {
         return Response.json({ error: "Forbidden" }, { status: 403 });
     }

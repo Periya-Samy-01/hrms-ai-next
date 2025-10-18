@@ -16,6 +16,7 @@ const QuickActions = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(employeeData),
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -38,6 +39,7 @@ const QuickActions = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(announcementData),
+        credentials: 'include',
       });
 
       if (!res.ok) {
