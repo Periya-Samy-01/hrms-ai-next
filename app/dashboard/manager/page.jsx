@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday } from 'date-fns';
 import EmployeePerformanceModal from '../../components/dashboard/manager/EmployeePerformanceModal';
+import TeamManagementModal from '../../components/dashboard/manager/TeamManagementModal';
 
 const ManagerDashboard = () => {
   const [data, setData] = useState({ pendingApprovals: [], teamMembers: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 
   const handleOpenModal = (employee) => {
     setSelectedEmployee(employee);
@@ -16,6 +18,9 @@ const ManagerDashboard = () => {
   const handleCloseModal = () => {
     setSelectedEmployee(null);
   };
+
+  const handleOpenTeamModal = () => setIsTeamModalOpen(true);
+  const handleCloseTeamModal = () => setIsTeamModalOpen(false);
 
   const fetchData = async () => {
     try {
@@ -124,7 +129,10 @@ const ManagerDashboard = () => {
 
           {/* My Team Section */}
           <section>
-            <h2 className="text-2xl font-bold mb-4">My Team</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">My Team</h2>
+              <button onClick={handleOpenTeamModal} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">+</button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {teamMembers?.map((member) => (
                 <div
@@ -180,6 +188,14 @@ const ManagerDashboard = () => {
           employee={selectedEmployee}
           onClose={handleCloseModal}
           onAction={fetchData}
+        />
+      )}
+
+      {isTeamModalOpen && (
+        <TeamManagementModal
+          teamMembers={teamMembers}
+          onClose={handleCloseTeamModal}
+          onTeamUpdate={fetchData}
         />
       )}
     </div>
