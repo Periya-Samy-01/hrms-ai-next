@@ -5,14 +5,20 @@ const ApprovalRequestSchema = new mongoose.Schema({
   manager: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   type: {
     type: String,
-    enum: ["Leave", "Expense"],
+    enum: ["Leave", "Expense", "Goal"],
     required: true,
   },
   details: {
+    // For Leave
     startDate: Date,
     endDate: Date,
-    amount: Number,
+    reason: String,
+    // For Goals
+    title: String,
     description: String,
+    // For Expenses
+    amount: Number,
+
   },
   status: {
     type: String,
