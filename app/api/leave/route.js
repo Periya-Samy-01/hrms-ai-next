@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/dbConnect';
 import LeaveRequest from '@/models/LeaveRequest';
 import { verifyToken } from '@/lib/auth';
 import User from '@/models/User';
+import ApprovalRequest from '@/models/ApprovalRequest';
 
 export async function POST(req) {
   await connectDB();
@@ -19,6 +20,15 @@ export async function POST(req) {
   }
 
   try {
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    if (!user.manager) {
+      return NextResponse.json({ message: 'Cannot request leave: No manager assigned.' }, { status: 400 });
+    }
+
     const leaveRequest = new LeaveRequest({
       employee: decoded.id,
       startDate,
@@ -26,9 +36,23 @@ export async function POST(req) {
       reason,
     });
     await leaveRequest.save();
+
+    const approvalRequest = new ApprovalRequest({
+      requester: user._id,
+      manager: user.manager,
+      type: 'Leave',
+      details: {
+        startDate,
+        endDate,
+        description: reason,
+      },
+    });
+    await approvalRequest.save();
+
     return NextResponse.json(leaveRequest, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    console.error('Leave Request Error:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 
