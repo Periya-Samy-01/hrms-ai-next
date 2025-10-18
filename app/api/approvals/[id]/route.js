@@ -2,6 +2,8 @@
 import { verifyToken } from "@/lib/auth";
 import { connectDB } from "@/lib/dbConnect";
 import ApprovalRequest from "@/models/ApprovalRequest";
+import LeaveRequest from "@/models/LeaveRequest";
+import Goal from "@/models/Goal";
 
 export async function PATCH(req, { params }) {
   try {
@@ -38,6 +40,16 @@ export async function PATCH(req, { params }) {
 
     approval.status = status;
     await approval.save();
+
+    // If the approval is for a LeaveRequest, update its status as well
+    if (approval.referenceModel === 'LeaveRequest') {
+      await LeaveRequest.findByIdAndUpdate(approval.referenceId, { status });
+    } else if (approval.referenceModel === 'Goal') {
+      // Handle Goal status updates differently if needed, e.g., 'Approved' -> 'Active'
+      const goalStatus = status === 'Approved' ? 'Active' : 'Needs Revision';
+      await Goal.findByIdAndUpdate(approval.referenceId, { status: goalStatus });
+    }
+
 
     return Response.json(approval);
   } catch (error) {

@@ -16,8 +16,19 @@ const ApprovalRequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Approved", "Denied"],
+    enum: ["Pending", "Approved", "Denied", "Rejected"],
     default: "Pending",
+  },
+  referenceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    // Dynamically reference the model specified in `referenceModel`
+    refPath: 'referenceModel'
+  },
+  referenceModel: {
+    type: String,
+    required: true,
+    enum: ['LeaveRequest', 'Goal']
   },
   createdAt: { type: Date, default: Date.now },
 });
