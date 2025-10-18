@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AddGoalModal from '../../components/dashboard/employee/AddGoalModal';
+import RequestLeaveModal from '../../components/dashboard/employee/RequestLeaveModal';
 
 const EmployeeDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddGoalModalOpen, setAddGoalModalOpen] = useState(false);
+  const [isRequestLeaveModalOpen, setRequestLeaveModalOpen] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -54,7 +56,30 @@ const EmployeeDashboard = () => {
       }
 
       await fetchDashboardData(); // Refetch all dashboard data to show the new goal
-      setIsModalOpen(false);
+      setAddGoalModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
+  const handleRequestLeave = async (leaveRequest) => {
+    try {
+      const res = await fetch('/api/leave', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leaveRequest),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to submit leave request');
+      }
+
+      await fetchDashboardData(); // Refetch all dashboard data to show the new goal
+      setRequestLeaveModalOpen(false);
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -156,7 +181,10 @@ const EmployeeDashboard = () => {
 
           {/* Action Buttons */}
           <div className="space-y-4">
-            <button className="w-full bg-blue-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+            <button
+              onClick={() => setRequestLeaveModalOpen(true)}
+              className="w-full bg-blue-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+            >
               Request Leave
             </button>
             <Link href="/dashboard/employee/payslips" passHref>
@@ -191,7 +219,7 @@ const EmployeeDashboard = () => {
               <h2 className="text-xl font-bold">My Performance Goals</h2>
               <div className="relative group">
                 <button
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => setAddGoalModalOpen(true)}
                   disabled={!user.manager}
                   className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -239,9 +267,14 @@ const EmployeeDashboard = () => {
       </div>
     </div>
       <AddGoalModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isAddGoalModalOpen}
+        onClose={() => setAddGoalModalOpen(false)}
         onAddGoal={handleAddGoal}
+      />
+      <RequestLeaveModal
+        isOpen={isRequestLeaveModalOpen}
+        onClose={() => setRequestLeaveModalOpen(false)}
+        onSubmit={handleRequestLeave}
       />
     </>
   );

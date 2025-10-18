@@ -45,8 +45,11 @@ export async function middleware(req) {
         case "hr":
           url.pathname = "/dashboard/hr";
           break;
-        default:
+        case "employee":
           url.pathname = "/dashboard/employee";
+          break;
+        default:
+          url.pathname = "/login";
           break;
       }
       return NextResponse.redirect(url);

@@ -7,13 +7,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
+      console.log("Attempting to log in...");
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,13 +25,15 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+      console.log("Login response received:", data);
 
       if (!res.ok) {
         setError(data.error || "Login failed");
+        setIsLoading(false);
         return;
       }
 
-      // Redirect based on user role
+      console.log("Login successful, redirecting...");
       const { user } = data;
       if (user.role === "admin") {
         router.push("/dashboard/admin");
@@ -40,7 +45,9 @@ export default function LoginPage() {
         router.push("/dashboard/employee");
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
+      setIsLoading(false);
     }
   };
 
@@ -61,6 +68,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={isLoading}
           />
         </div>
 
@@ -73,6 +81,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={isLoading}
           />
         </div>
 
@@ -83,8 +92,9 @@ export default function LoginPage() {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          disabled={isLoading}
         >
-          Login
+          {isLoading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-sm text-center mt-4">
