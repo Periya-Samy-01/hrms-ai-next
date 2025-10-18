@@ -138,7 +138,7 @@ const PayslipsPage = () => {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-800">Payslip Details</h3>
-                        <p className="text-sm text-gray-500">Gross: ${payslip.grossEarnings.toFixed(2)} | Deductions: -${payslip.totalDeductions.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">Gross: ${payslip.grossEarnings.toFixed(2)} | Deductions: -${payslip.deductions.toFixed(2)}</p>
                       </div>
                       <button className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-sm hover:bg-gray-300 transition-colors text-sm">
                         Download as PDF

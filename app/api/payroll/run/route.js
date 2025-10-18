@@ -36,7 +36,7 @@ export async function POST(req) {
       );
     }
 
-    const salaryStructures = await SalaryStructure.find({}).populate("employeeId");
+    const salaryStructures = await SalaryStructure.find({}).populate("user");
 
     if (!salaryStructures || salaryStructures.length === 0) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(req) {
 
     let processedCount = 0;
     for (const structure of salaryStructures) {
-      const { employeeId: user, baseSalary } = structure;
+      const { user, baseSalary } = structure;
 
       if (!user) continue;
 
