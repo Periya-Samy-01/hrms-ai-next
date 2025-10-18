@@ -3,7 +3,8 @@ dotenv.config({ path: '.env.local' });
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
-import Goal from '../models/Goal.js'; // Import Goal model
+import Goal from '../models/Goal.js';
+import ApprovalRequest from '../models/ApprovalRequest.js';
 import { connectDB } from '../lib/dbConnect.js';
 
 const seedDB = async () => {
@@ -14,7 +15,8 @@ const seedDB = async () => {
 
     console.log('Clearing existing data...');
     await User.deleteMany({});
-    await Goal.deleteMany({}); // Clear existing goals
+    await Goal.deleteMany({});
+    await ApprovalRequest.deleteMany({});
     console.log('Existing data cleared.');
 
     const usersData = [
@@ -96,13 +98,28 @@ const seedDB = async () => {
     const createdGoals = await Goal.insertMany(goals);
     console.log(`${createdGoals.length} goals created.`);
 
-    // Link goals to users
+    // Link goals to users and create approval requests
     for (const goal of createdGoals) {
       await User.findByIdAndUpdate(goal.employeeId, {
         $push: { performanceGoals: goal._id },
       });
+
+      if (goal.status === 'Pending Approval') {
+        const approvalRequest = new ApprovalRequest({
+          requester: goal.employeeId,
+          manager: goal.managerId,
+          type: 'Goal',
+          details: {
+            title: goal.title,
+            description: goal.description,
+          },
+          referenceId: goal._id,
+          referenceModel: 'Goal',
+        });
+        await approvalRequest.save();
+      }
     }
-    console.log('Goals linked to respective employees.');
+    console.log('Goals linked and approval requests created.');
 
     console.log('✅ Database seeded successfully!');
   } catch (error) {

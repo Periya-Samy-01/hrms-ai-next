@@ -6,8 +6,8 @@ import LeaveRequest from "@/models/LeaveRequest";
 import Goal from "@/models/Goal";
 
 export async function PATCH(req, { params }) {
-  const { id } = params;
   try {
+    const { id } = params;
     await connectDB();
     const token = req.cookies.get("token")?.value;
 

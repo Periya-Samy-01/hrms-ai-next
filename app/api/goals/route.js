@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/dbConnect";
 import Goal from "@/models/Goal";
 import User from "@/models/User";
 import ApprovalRequest from "@/models/ApprovalRequest";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(req) {
   await connectDB();
@@ -15,7 +15,7 @@ export async function POST(req) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = await verifyToken(token);
     const body = await req.json();
     const {
       title,
@@ -82,7 +82,7 @@ export async function GET(req) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = await verifyToken(token);
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get("employeeId");
 
