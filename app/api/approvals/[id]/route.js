@@ -6,6 +6,7 @@ import LeaveRequest from "@/models/LeaveRequest";
 import Goal from "@/models/Goal";
 
 export async function PATCH(req, { params }) {
+  const { id } = params;
   try {
     await connectDB();
     const token = req.cookies.get("token")?.value;
@@ -28,8 +29,12 @@ export async function PATCH(req, { params }) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const { id } = params;
-    const approval = await ApprovalRequest.findById(id);
+    const approval = await ApprovalRequest.findByIdAndUpdate(
+      id,
+      { status, processedAt: new Date() },
+      { new: true }
+    );
+
     if (!approval) {
       return Response.json({ error: "Approval request not found" }, { status: 404 });
     }
@@ -38,9 +43,6 @@ export async function PATCH(req, { params }) {
     if (decoded.role === "manager" && approval.manager.toString() !== decoded.sub) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
-
-    approval.status = status;
-    await approval.save();
 
     // If the approval is for a LeaveRequest, update its status as well
     if (approval.referenceModel === 'LeaveRequest') {
