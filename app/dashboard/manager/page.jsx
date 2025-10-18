@@ -35,22 +35,28 @@ const ManagerDashboard = () => {
     fetchData();
   }, []);
 
-  const handleApprovalAction = async (id, status) => {
+  const handleApprovalAction = async (id, status, type) => {
+    const url = type === 'Goal' ? `/api/goals/${id}` : `/api/approvals/${id}`;
+    const body = type === 'Goal'
+      ? JSON.stringify({ status: status === 'Approved' ? 'Active' : 'Needs Revision' })
+      : JSON.stringify({ status });
+
     try {
-      const res = await fetch(`/api/approvals/${id}`, {
+      const res = await fetch(url, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
+        body: body,
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update request');
+        const errorData = await res.json();
+        throw new Error(errorData.message || `Failed to update ${type} request`);
       }
 
       // Refresh data to show updated list
       fetchData();
     } catch (err) {
-      console.error("Failed to process approval:", err);
+      console.error(`Failed to process ${type} approval:`, err);
       alert(`Error: ${err.message}`);
     }
   };
@@ -101,10 +107,11 @@ const ManagerDashboard = () => {
                         <p className="font-semibold">{request.type} Request: {request.requester?.name || 'Unknown User'}</p>
                         {request.type === 'Leave' && <p className="text-sm text-gray-600">Dates: {request.details?.startDate ? new Date(request.details.startDate).toLocaleDateString() : 'N/A'} to {request.details?.endDate ? new Date(request.details.endDate).toLocaleDateString() : 'N/A'}</p>}
                         {request.type === 'Expense' && <p className="text-sm text-gray-600">Amount: ${request.details?.amount || 'N/A'}</p>}
+                        {request.type === 'Goal' && <p className="text-sm text-gray-600">Goal: "{request.details?.title || 'N/A'}"</p>}
                       </div>
                       <div className="flex space-x-2">
-                        <button onClick={() => handleApprovalAction(request._id, 'Approved')} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
-                        <button onClick={() => handleApprovalAction(request._id, 'Denied')} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Deny</button>
+                        <button onClick={() => handleApprovalAction(request._id, 'Approved', request.type)} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Approve</button>
+                        <button onClick={() => handleApprovalAction(request._id, 'Denied', request.type)} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Deny</button>
                       </div>
                     </li>
                   ))}

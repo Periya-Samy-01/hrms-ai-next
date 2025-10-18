@@ -54,7 +54,7 @@ const ManageSalaryPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ employeeId, baseSalary, payFrequency }),
+        body: JSON.stringify({ userId: employeeId, baseSalary, payFrequency }),
       });
 
       const data = await res.json();

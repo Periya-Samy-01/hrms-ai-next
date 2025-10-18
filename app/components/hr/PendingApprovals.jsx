@@ -2,18 +2,18 @@
 import { useState, useEffect } from 'react';
 
 const PendingApprovals = () => {
-  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchLeaveRequests = async () => {
+  const fetchApprovals = async () => {
     try {
-      const res = await fetch('/api/leave');
+      const res = await fetch('/api/approvals');
       if (!res.ok) {
-        throw new Error('Failed to fetch leave requests');
+        throw new Error('Failed to fetch approvals');
       }
       const data = await res.json();
-      setLeaveRequests(data);
+      setApprovals(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -22,13 +22,13 @@ const PendingApprovals = () => {
   };
 
   useEffect(() => {
-    fetchLeaveRequests();
+    fetchApprovals();
   }, []);
 
   const handleApproval = async (id, status) => {
     try {
-      const res = await fetch(`/api/leave/${id}`, {
-        method: 'PUT',
+      const res = await fetch(`/api/approvals/${id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -36,10 +36,10 @@ const PendingApprovals = () => {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update leave request');
+        throw new Error('Failed to update approval request');
       }
 
-      await fetchLeaveRequests();
+      await fetchApprovals();
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -58,15 +58,17 @@ const PendingApprovals = () => {
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Pending HR Approvals</h2>
       <ul className="space-y-4">
-        {leaveRequests.map((request) => (
+        {approvals.map((request) => (
           <li key={request._id} className="p-3 bg-gray-50 rounded-md">
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-semibold">Leave Request</p>
-                <p className="text-sm text-gray-600">Applicant: {request.employee.name}</p>
-                <p className="text-sm text-gray-600">
-                  {new Date(request.startDate).toLocaleDateString()} - {new Date(request.endDate).toLocaleDateString()}
-                </p>
+                <p className="font-semibold">{request.type} Request</p>
+                <p className="text-sm text-gray-600">Applicant: {request.requester.name}</p>
+                {request.type === 'Leave' && (
+                  <p className="text-sm text-gray-600">
+                    {new Date(request.details.startDate).toLocaleDateString()} - {new Date(request.details.endDate).toLocaleDateString()}
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <button
@@ -83,7 +85,7 @@ const PendingApprovals = () => {
                 </button>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-2">{request.reason}</p>
+            {request.type === 'Leave' && <p className="text-sm text-gray-600 mt-2">{request.details.description}</p>}
           </li>
         ))}
       </ul>
