@@ -41,11 +41,11 @@ const seedDB = async () => {
     const employees = createdUsers.filter(u => u.email !== 'manager@example.com' && u.email !== 'admin@example.com');
 
     // Assign employees to manager's team and set their manager
-    manager.team = employees.map(e => e._id);
+    manager.team = [];
     await manager.save();
 
     for (const employee of employees) {
-      employee.manager = manager._id;
+      employee.manager = null;
       await employee.save();
     }
     console.log('Manager and team assigned.');
