@@ -192,9 +192,6 @@ const EmployeeDashboard = () => {
                 View Payslips
               </button>
             </Link>
-            <button className="w-full bg-yellow-500 text-white font-bold py-4 rounded-lg shadow-md hover:bg-yellow-600 transition-colors">
-              Submit Feedback
-            </button>
           </div>
         </div>
 
@@ -220,16 +217,10 @@ const EmployeeDashboard = () => {
               <div className="relative group">
                 <button
                   onClick={() => setAddGoalModalOpen(true)}
-                  disabled={!user.manager}
-                  className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors"
                 >
                   Add New Goal
                 </button>
-                {!user.manager && (
-                  <span className="absolute bottom-full mb-2 hidden group-hover:block w-max bg-black text-white text-xs rounded py-1 px-2">
-                    You must have a manager assigned to add a goal.
-                  </span>
-                )}
               </div>
             </div>
             <div className="space-y-4">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/dbConnect";
 import Goal from "@/models/Goal";
 import User from "@/models/User";
+import ApprovalRequest from "@/models/ApprovalRequest";
 import jwt from "jsonwebtoken";
 
 export async function POST(req) {
@@ -45,6 +46,22 @@ export async function POST(req) {
 
     employee.performanceGoals.push(newGoal._id);
     await employee.save();
+
+    // Create an approval request for the manager
+    if (employee.manager) {
+      const approvalRequest = new ApprovalRequest({
+        requester: employee._id,
+        manager: employee.manager,
+        type: "Goal",
+        details: {
+          title: newGoal.title,
+          description: newGoal.description,
+        },
+        referenceId: newGoal._id,
+        referenceModel: "Goal",
+      });
+      await approvalRequest.save();
+    }
 
     return NextResponse.json(newGoal, { status: 201 });
   } catch (error) {
