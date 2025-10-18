@@ -27,9 +27,9 @@ export async function POST(req) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { type, details } = await req.json();
-    if (!type || !details) {
-      return Response.json({ error: "Type and details are required" }, { status: 400 });
+    const { type, details, referenceId, referenceModel } = await req.json();
+    if (!type || !details || !referenceId || !referenceModel) {
+      return Response.json({ error: "Type, details, referenceId, and referenceModel are required" }, { status: 400 });
     }
 
     const manager = await User.findById(user.manager);
@@ -42,6 +42,8 @@ export async function POST(req) {
       manager: manager._id,
       type,
       details,
+      referenceId,
+      referenceModel,
     });
     await approvalRequest.save();
 

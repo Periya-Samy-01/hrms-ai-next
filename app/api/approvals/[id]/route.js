@@ -28,7 +28,8 @@ export async function PATCH(req, { params }) {
       return Response.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const approval = await ApprovalRequest.findById(params.id);
+    const { id } = params;
+    const approval = await ApprovalRequest.findById(id);
     if (!approval) {
       return Response.json({ error: "Approval request not found" }, { status: 404 });
     }
@@ -42,20 +43,12 @@ export async function PATCH(req, { params }) {
     await approval.save();
 
     // If the approval is for a LeaveRequest, update its status as well
-    console.log(`Updating approval ${approval._id}: model=${approval.referenceModel}, refId=${approval.referenceId}, status=${status}`);
-    try {
-      if (approval.referenceModel === 'LeaveRequest') {
-        const updatedLeave = await LeaveRequest.findByIdAndUpdate(approval.referenceId, { status }, { new: true });
-        console.log('Updated LeaveRequest:', updatedLeave);
-        if (!updatedLeave) console.error(`Failed to find and update LeaveRequest with id ${approval.referenceId}`);
-      } else if (approval.referenceModel === 'Goal') {
-        const goalStatus = status === 'Approved' ? 'Active' : 'Needs Revision';
-        const updatedGoal = await Goal.findByIdAndUpdate(approval.referenceId, { status: goalStatus }, { new: true });
-        console.log('Updated Goal:', updatedGoal);
-        if (!updatedGoal) console.error(`Failed to find and update Goal with id ${approval.referenceId}`);
-      }
-    } catch (updateError) {
-      console.error("💥 Error updating referenced document:", updateError);
+    if (approval.referenceModel === 'LeaveRequest') {
+      await LeaveRequest.findByIdAndUpdate(approval.referenceId, { status });
+    } else if (approval.referenceModel === 'Goal') {
+      // Handle Goal status updates differently if needed, e.g., 'Approved' -> 'Active'
+      const goalStatus = status === 'Approved' ? 'Active' : 'Needs Revision';
+      await Goal.findByIdAndUpdate(approval.referenceId, { status: goalStatus });
     }
 
 
